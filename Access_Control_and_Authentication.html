@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Report: Access Control & Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-button {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .tab-button.active {
+            background-color: #1d4ed8;
+            color: #ffffff;
+        }
+        .tab-button:not(.active):hover {
+            background-color: #eff6ff;
+        }
+        .nav-link {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .nav-link.active {
+            background-color: #1d4ed8;
+            color: #ffffff;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #374151;
+        }
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <!-- Chosen Palette: "Professional Blue & Gray" -->
+    <!-- Application Structure Plan: Designed as a single-page application with a fixed sidebar for primary navigation and a main content area. The main content area uses JavaScript-driven tabs for secondary navigation within complex topics (e.g., 'Authentication Methods', 'Cryptographic Tech'). This structure was chosen because the source report is dense and highly structured. A persistent sidebar provides a clear 'map' of the content, while the tabbed interface allows users to drill down into specific sub-topics without scrolling or losing context, promoting exploration and comparison. -->
+    <!-- Visualization & Content Choices: 
+        - Info: CIA Model; Goal: Inform; Viz/Method: 3-column HTML/Tailwind layout; Interaction: None; Justification: Clear, simple, direct presentation; Library: HTML/Tailwind.
+        - Info: Access Control Types (DAC, MAC, RBAC); Goal: Inform/Compare; Viz/Method: A tabbed interface; Interaction: Click-to-reveal; Justification: Allows comparison of distinct concepts without clutter; Library: Vanilla JS, HTML/Tailwind.
+        - Info: Authentication Method Comparison; Goal: Compare; Viz/Method: Bar chart (Security vs. Convenience); Interaction: Hover tooltips; Justification: Visual comparison is faster to grasp; Library: Chart.js (Bar Chart).
+        - Info: Authentication Threats; Goal: Inform/Compare; Viz/Method: Radar Chart (Commonality, Difficulty, Impact); Interaction: Select from dropdown -> Chart updates; Justification: Interactive exploration of the threat landscape; Library: Chart.js (Radar Chart), Vanilla JS.
+        - Info: Hashing Process; Goal: Inform/Demo; Viz/Method: Interactive "Hashing Simulator" (text input, button, output); Interaction: User types and clicks to see a real SHA-256 hash; Justification: An interactive demo is more instructive than a static diagram; Library: Vanilla JS (crypto.subtle), HTML/Tailwind.
+        - Info: Digital Signature Process; Goal: Organize/Inform; Viz/Method: 2-column (Sender, Receiver) step-by-step flow; Interaction: None (static flow); Justification: Breaks down a complex process into a clear, A-B flow; Library: HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-gray-100 font-sans leading-normal text-gray-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <nav class="w-full md:w-64 bg-gray-900 text-white p-5 md:min-h-screen">
+            <h2 class="text-2xl font-bold mb-6 text-center">Security Explorer</h2>
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="nav-link active text-lg block py-2 px-4 rounded" data-page="home">
+                        <span class="mr-2">🏠</span>Overview
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link text-lg block py-2 px-4 rounded" data-page="methods">
+                        <span class="mr-2">🔑</span>Auth Methods
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link text-lg block py-2 px-4 rounded" data-page="crypto">
+                        <span class="mr-2">🔬</span>Crypto Tech
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link text-lg block py-2 px-4 rounded" data-page="threats">
+                        <span class="mr-2">⚠️</span>Threats & Protocols
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+
+            <div id="page-home" class="page-content active">
+                <h1 class="text-4xl font-bold text-gray-900 mb-6">Access Control & Authentication</h1>
+                
+                <p class="text-lg text-gray-700 mb-8">
+                    Welcome to the interactive guide on digital security. This application explores the fundamental concepts of how systems protect information and verify user identities. Use the navigation on the left to explore the core pillars of access control, authentication, and the technologies that power them.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3 text-blue-800">What is Access Control?</h3>
+                        <p class="text-gray-700">Access control is the selective restriction of access to a resource. It's the "gatekeeper" that answers the question, "Is this user allowed to do this action?" It defines who can access what, and what they are allowed to do (e.g., read, write, delete).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3 text-blue-800">What is Authentication?</h3>
+                        <p class="text-gray-700">Authentication is the process of verifying that a user is who they claim to be. It's the "ID check" that answers the question, "Is this really you?" Before a system can decide what you're allowed to *do* (access control), it must first be sure of *who you are*. </p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold text-center mb-6">The CIA Triad: Core Security Goals</h2>
+                    <p class="text-center text-gray-600 mb-6">These three principles form the foundation of information security. All security measures, including access control and authentication, aim to protect one or more of these goals.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="border-l-4 border-blue-600 bg-blue-50 p-6 rounded-r-lg">
+                            <h3 class="text-2xl font-semibold mb-2 text-blue-900">Confidentiality</h3>
+                            <p class="text-gray-700">Ensuring that information is not disclosed to unauthorized individuals, entities, or processes. It's about keeping secrets secret. <br><strong>Example:</strong> Encrypting an email.</p>
+                        </div>
+                        <div class="border-l-4 border-green-600 bg-green-50 p-6 rounded-r-lg">
+                            <h3 class="text-2xl font-semibold mb-2 text-green-900">Integrity</h3>
+                            <p class="text-gray-700">Maintaining the consistency, accuracy, and trustworthiness of data. It ensures data has not been tampered with or altered. <br><strong>Example:</strong> Using a hash to verify a file download.</p>
+                        </div>
+                        <div class="border-l-4 border-yellow-600 bg-yellow-50 p-6 rounded-r-lg">
+                            <h3 class="text-2xl font-semibold mb-2 text-yellow-900">Availability</h3>
+                            <p class="text-gray-700">Ensuring that information and services are available for use when needed by authorized users. It protects against downtime. <br><strong>Example:</strong> Defending against a DDoS attack.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-methods" class="page-content">
+                <h1 class="text-4xl font-bold text-gray-900 mb-6">Authentication Methods</h1>
+                <p class="text-lg text-gray-700 mb-8">
+                    Authentication is based on one or more "factors" that prove your identity. This section explores the common methods, their strengths, weaknesses, and how they are combined for greater security. Click the tabs below to learn about each category.
+                </p>
+
+                <div id="methods-tabs">
+                    <div class="flex border-b border-gray-300 mb-6">
+                        <button class="tab-button active font-semibold py-3 px-6 rounded-t-lg -mb-px" data-tab="passwords">Passwords</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="biometrics">Biometrics</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="tokens">Possession (Tokens)</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="mfa">Multi-Factor (MFA)</button>
+                    </div>
+
+                    <div class="tab-content active bg-white p-6 rounded-lg shadow-md" data-tab-content="passwords">
+                        <h3 class="text-2xl font-semibold mb-3">Something You Know: Passwords</h3>
+                        <p class="text-gray-700 mb-4">This is the most common authentication factor. It's a secret string of characters (a password, PIN, or passphrase) that only the user should know.</p>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong>Strengths:</strong> Simple to implement, universally understood, and easy for users to manage (in theory).</li>
+                            <li><strong>Weaknesses:</strong> Often weak (e.g., "123456"), reused across multiple sites, and highly vulnerable to theft through phishing, keylogging, and brute-force attacks.</li>
+                            <li><strong>Threats:</strong> Brute-force, dictionary attacks, phishing, social engineering, credential stuffing.</li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="biometrics">
+                        <h3 class="text-2xl font-semibold mb-3">Something You Are: Biometrics</h3>
+                        <p class="text-gray-700 mb-4">This factor uses unique biological traits of the user for verification. It's convenient because you are your own "key."</p>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong>Examples:</strong> Fingerprint scanners, facial recognition (e.g., Face ID), iris scans, voice recognition.</li>
+                            <li><strong>Strengths:</strong> Extremely convenient (nothing to remember or carry), and very difficult to fake or steal (though not impossible).</li>
+                            <li><strong>Weaknesses:</strong> Concerns about privacy (storing biometric data), potential for false positives/negatives. A stolen biometric template is compromised forever—you can't "change" your fingerprint.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="tokens">
+                        <h3 class="text-2xl font-semibold mb-3">Something You Have: Possession</h3>
+                        <p class="text-gray-700 mb-4">This factor relies on a physical or digital item in the user's possession. Proving you have the item proves your identity.</p>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong>Examples:</strong> A physical USB key (e.g., YubiKey), a smart card, a mobile phone receiving an SMS code, or a mobile app generating a one-time password (OTP) (e.g., Google Authenticator).</li>
+                            <li><strong>Strengths:</strong> Much more secure than passwords alone. A hacker can't log in just by stealing your password; they also need your phone or key.</li>
+                            <li><strong>Weaknesses:</strong> The "thing" can be lost, stolen, or broken. SMS-based OTPs are vulnerable to SIM-swapping attacks.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="mfa">
+                        <h3 class="text-2xl font-semibold mb-3">Multi-Factor Authentication (MFA)</h3>
+                        <p class="text-gray-700 mb-4">MFA, or Two-Factor Authentication (2FA), is the gold standard for security. It combines <strong>two or more</strong> different types of authentication factors. For example, logging in with a password (something you know) AND a code from your phone (something you have).</p>
+                        <p class="text-gray-700 mb-6">This layered defense means that even if one factor is compromised (like your password), an attacker still can't get in without the second factor.</p>
+                        <h4 class="text-xl font-semibold text-center mb-4">Method Comparison: Security vs. Convenience</h4>
+                        <div class="chart-container">
+                            <canvas id="authCompareChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-crypto" class="page-content">
+                <h1 class="text-4xl font-bold text-gray-900 mb-6">Cryptographic Technology</h1>
+                <p class="text-lg text-gray-700 mb-8">
+                    Modern authentication and access control are built on a foundation of cryptography. These technologies provide proof, ensure integrity, and maintain confidentiality. This section explores two of the most critical components: hashing and digital signatures.
+                </p>
+
+                <div id="crypto-tabs">
+                    <div class="flex border-b border-gray-300 mb-6">
+                        <button class="tab-button active font-semibold py-3 px-6 rounded-t-lg -mb-px" data-tab="hashing">Hashing</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="signatures">Digital Signatures</button>
+                    </div>
+
+                    <div class="tab-content active bg-white p-6 rounded-lg shadow-md" data-tab-content="hashing">
+                        <h3 class="text-2xl font-semibold mb-3">Hashing: The One-Way Street</h3>
+                        <p class="text-gray-700 mb-4">A hash function is an algorithm that takes any input (like a password, a file, or a message) and converts it into a fixed-length string of characters, called a "hash."</p>
+                        <ul class="list-disc list-inside space-y-2 mb-4">
+                            <li><strong>It's One-Way:</strong> You can't reverse the process to get the original input from the hash.</li>
+                            <li><strong>It's Deterministic:</strong> The same input will *always* produce the same hash.</li>
+                            <li><strong>It's Unique (Ideally):</strong> Different inputs should produce different hashes (collision-resistant).</li>
+                        </ul>
+                        <p class="text-gray-700 mb-4"><strong>Primary Use:</strong> Securely storing passwords. Systems never store your password. They store a *hash* of your password. When you log in, the system hashes the password you entered and compares it to the stored hash. If they match, you're in!</p>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                             <h4 class="text-xl font-semibold text-center mb-4">Interactive SHA-256 Hash Simulator</h4>
+                             <p class="text-center text-gray-600 mb-4">Type anything below to see its unique hash generated in real-time. Notice how even a tiny change (like adding a space) completely changes the output.</p>
+                             <div class="mb-4">
+                                 <label for="hash-input" class="block text-sm font-medium text-gray-700 mb-1">Your Input:</label>
+                                 <input type="text" id="hash-input" class="w-full p-2 border border-gray-300 rounded-md shadow-sm" placeholder="Type here...">
+                             </div>
+                             <div>
+                                 <label for="hash-output" class="block text-sm font-medium text-gray-700 mb-1">SHA-256 Output (Hash):</label>
+                                 <div id="hash-output" class="w-full p-2 bg-gray-200 rounded-md font-mono text-sm break-all h-24 overflow-y-auto">...</div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="signatures">
+                        <h3 class="text-2xl font-semibold mb-3">Digital Signatures: Proof of Identity</h3>
+                        <p class="text-gray-700 mb-4">A digital signature uses asymmetric (public/private key) cryptography to provide three crucial guarantees for a message or document:</p>
+                        <ul class="list-disc list-inside space-y-2 mb-6">
+                            <li><strong>Authenticity:</strong> Proves who the sender is.</li>
+                            <li><strong>Integrity:</strong> Proves the message wasn't altered.</li>
+                            <li><strong>Non-Repudiation:</strong> The sender cannot later deny having sent the message.</li>
+                        </ul>
+                        
+                        <h4 class="text-xl font-semibold text-center mb-4">How a Digital Signature Works</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                                <h5 class="text-lg font-semibold text-blue-800 mb-3">1. Sender (Signing)</h5>
+                                <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                                    <li><strong>Hash:</strong> The sender creates a hash of the original message.</li>
+                                    <li><strong>Encrypt:</strong> The sender encrypts this hash using their own <strong>private key</strong>. This encrypted hash is the digital signature.</li>
+                                    <li><strong>Send:</strong> The sender sends the original message, the digital signature, and their public key.</li>
+                                </ol>
+                            </div>
+                            <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                                <h5 class="text-lg font-semibold text-green-800 mb-3">2. Receiver (Verifying)</h5>
+                                <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                                    <li><strong>Decrypt:</strong> The receiver uses the sender's <strong>public key</strong> to decrypt the digital signature. This reveals the sender's original hash.</li>
+                                    <li><strong>Re-Hash:</strong> The receiver independently creates a new hash from the original message they received.</li>
+                                    <li><strong>Compare:</strong> The receiver compares the hash they just created with the hash they decrypted. If they match, the signature is valid!</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-threats" class="page-content">
+                <h1 class="text-4xl font-bold text-gray-900 mb-6">Threats & Protocols</h1>
+                <p class="text-lg text-gray-700 mb-8">
+                    Understanding the methods of authentication is only half the battle. This section explores the common threats attackers use to defeat these systems and a common protocol (RPC) that relies heavily on proper authentication to remain secure.
+                </p>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h2 class="text-3xl font-bold text-center mb-4">Authentication Threat Analysis</h2>
+                    <p class="text-center text-gray-600 mb-6">Select a threat from the dropdown to visualize its characteristics. This helps in understanding what makes different attacks more or less dangerous.</p>
+                    
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-6">
+                        <label for="threat-selector" class="font-semibold">Select a Threat:</label>
+                        <select id="threat-selector" class="p-2 border border-gray-300 rounded-md shadow-sm">
+                            <option value="phishing">Phishing</option>
+                            <option value="mitm">Man-in-the-Middle (MitM)</option>
+                            <option value="brute-force">Brute Force</option>
+                            <option value="keylogging">Keylogging</option>
+                            <option value="credential-stuffing">Credential Stuffing</option>
+                        </select>
+                    </div>
+
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="threatRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold mb-4">RPC & Authentication</h2>
+                    <p class="text-gray-700 mb-4"><strong>Remote Procedure Call (RPC)</strong> is a protocol that allows a program on one computer to execute code on another computer as if it were a local function call. It's the plumbing that makes many distributed systems and microservices work.</p>
+                    <p class="text-gray-700 mb-4"><strong>The Security Challenge:</strong> By itself, RPC is not secure. An unauthenticated RPC endpoint would allow *anyone* to send commands to your server, which is extremely dangerous. Therefore, RPC protocols *must* be layered with strong authentication and access control.</p>
+                    <p class="text-gray-700"><strong>Authentication in RPC:</strong></p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong>API Keys/Tokens:</strong> A simple method where the client sends a secret token with each request.</li>
+                        <li><strong>Transport Layer Security (TLS):</strong> Encrypting the entire RPC connection (e.g., gRPC over HTTPS) to prevent eavesdropping (MitM attacks).</li>
+                        <li><strong>Token-Based Auth (e.g., JWT):</strong> The client authenticates once, receives a digitally signed token (like a JWT), and includes that token in all future RPC requests to prove its identity.</li>
+                        <li><strong>Kerberos:</strong> A more complex, ticket-based system common in large enterprise environments (e.g., Windows Active Directory) for securely authenticating services to each other.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page-content');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page');
+                    
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    pages.forEach(page => {
+                        if (page.id === 'page-' + pageId) {
+                            page.classList.add('active');
+                        } else {
+                            page.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            function setupTabs(containerSelector) {
+                const container = document.querySelector(containerSelector);
+                if (!container) return;
+
+                const tabButtons = container.querySelectorAll('.tab-button');
+                const tabContents = container.querySelectorAll('.tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabId = button.getAttribute('data-tab');
+
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+
+                        tabContents.forEach(content => {
+                            if (content.getAttribute('data-tab-content') === tabId) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            setupTabs('#methods-tabs');
+            setupTabs('#crypto-tabs');
+
+            const ctxAuth = document.getElementById('authCompareChart');
+            if (ctxAuth) {
+                new Chart(ctxAuth.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Passwords', 'Biometrics', 'Possession (Tokens)', 'MFA (Password + Token)'],
+                        datasets: [
+                            {
+                                label: 'Security',
+                                data: [3, 7, 7, 9],
+                                backgroundColor: 'rgba(30, 64, 175, 0.7)',
+                                borderColor: 'rgba(30, 64, 175, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Convenience',
+                                data: [9, 8, 6, 5],
+                                backgroundColor: 'rgba(5, 150, 105, 0.7)',
+                                borderColor: 'rgba(5, 150, 105, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            title: {
+                                display: true,
+                                text: 'Authentication Method Trade-offs (Scale 1-10)'
+                            }
+                        }
+                    }
+                });
+            }
+
+            const threatData = {
+                'phishing': {
+                    labels: ['Commonality', 'Technical Difficulty', 'Impact', 'User Deception', 'Detectability'],
+                    data: [9, 2, 8, 10, 4]
+                },
+                'mitm': {
+                    labels: ['Commonality', 'Technical Difficulty', 'Impact', 'User Deception', 'Detectability'],
+                    data: [4, 8, 10, 6, 3]
+                },
+                'brute-force': {
+                    labels: ['Commonality', 'Technical Difficulty', 'Impact', 'User Deception', 'Detectability'],
+                    data: [8, 3, 6, 1, 7]
+                },
+                'keylogging': {
+                    labels: ['Commonality', 'Technical Difficulty', 'Impact', 'User Deception', 'Detectability'],
+                    data: [5, 5, 9, 2, 2]
+                },
+                'credential-stuffing': {
+                    labels: ['Commonality', 'Technical Difficulty', 'Impact', 'User Deception', 'Detectability'],
+                    data: [10, 2, 7, 1, 5]
+                }
+            };
+
+            const ctxThreat = document.getElementById('threatRadarChart');
+            let threatChart;
+            if (ctxThreat) {
+                const initialData = threatData['phishing'];
+                threatChart = new Chart(ctxThreat.getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: initialData.labels,
+                        datasets: [{
+                            label: 'Phishing',
+                            data: initialData.data,
+                            fill: true,
+                            backgroundColor: 'rgba(197, 48, 48, 0.2)',
+                            borderColor: 'rgba(197, 48, 48, 1)',
+                            pointBackgroundColor: 'rgba(197, 48, 48, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(197, 48, 48, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 10,
+                                stepSize: 2,
+                                pointLabels: {
+                                    font: {
+                                        size: 13
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Threat Profile (Scale 1-10)'
+                            }
+                        }
+                    }
+                });
+            }
+
+            const threatSelector = document.getElementById('threat-selector');
+            if (threatSelector && threatChart) {
+                threatSelector.addEventListener('change', (e) => {
+                    const selectedThreat = e.target.value;
+                    const newData = threatData[selectedThreat];
+                    const selectedOption = e.target.options[e.target.selectedIndex].text;
+
+                    threatChart.data.labels = newData.labels;
+                    threatChart.data.datasets[0].data = newData.data;
+                    threatChart.data.datasets[0].label = selectedOption;
+                    threatChart.update();
+                });
+            }
+
+            const hashInput = document.getElementById('hash-input');
+            const hashOutput = document.getElementById('hash-output');
+            
+            async function updateHash() {
+                if (!hashInput || !hashOutput) return;
+                const inputText = hashInput.value;
+                if(inputText === "") {
+                    hashOutput.textContent = "...";
+                    return;
+                }
+                
+                try {
+                    const data = new TextEncoder().encode(inputText);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    hashOutput.textContent = hashHex;
+                } catch (error) {
+                    console.error('Hashing error:', error);
+                    hashOutput.textContent = "Error generating hash.";
+                }
+            }
+
+            if(hashInput) {
+                hashInput.addEventListener('input', updateHash);
+                updateHash();
+            }
+        });
+    </script>
+</body>
+</html>

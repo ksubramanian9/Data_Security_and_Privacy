@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The State of Encryption Techniques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Light neutrals, soft blues, deep blue accent) -->
+    <!-- Application Structure Plan: A thematic, single-page application with top navigation (Overview, Core Techniques, Data States, Quantum Threat, Future Solutions). This structure, chosen over a linear report, provides a logical, educational journey. The 'Overview' sets the stage. 'Core Techniques' and 'Data States' build foundational knowledge. 'Quantum Threat' establishes the primary challenge, leading directly to 'Future Solutions' (PQC, HE, QKD). Interactions include JS-powered tabs for comparison and an HTML-based interactive diagram for data states. -->
+    <!-- Visualization & Content Choices: 1. Key Size Comparison (Goal: Compare) -> Bar Chart. Interaction: Tooltip. Justification: Visually demonstrates the efficiency of ECC vs. RSA for equivalent security. (Chart.js). 2. Core Techniques (Symmetric/Asymmetric) (Goal: Compare) -> JS-powered tabs. Interaction: Click to toggle. Justification: Clear side-by-side comparison of foundational concepts. (HTML/JS). 3. Data States Diagram (Goal: Organize/Inform) -> Interactive HTML/Tailwind Diagram. Interaction: Click to show details. Justification: Organizes encryption application by use case. (HTML/JS). 4. NIST PQC Timeline (Goal: Inform) -> HTML/Tailwind Timeline Diagram. Interaction: None. Justification: Shows the concrete progress of PQC standardization. (HTML/Tailwind). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        /* Plain CSS replacement for previous Tailwind @apply rules
+           Provides a consistent visual system for nav pills, cards, tabs,
+           chart sizing, timeline markers, skip link, and responsive tweaks. */
+        :root{
+            --page-bg: #fbfdff;
+            --muted: #6b7280;
+            --accent: #2563eb;
+            --accent-deep: #1e40af;
+            --card-bg: #ffffff;
+            --soft-shadow: rgba(15,23,42,0.06);
+        }
+
+        html,body{height:100%;}
+        body{
+            margin:0;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            background: linear-gradient(180deg,#ffffff 0%,var(--page-bg) 100%);
+            color:#0f172a;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            line-height:1.5;
+        }
+
+        /* Skip link for keyboard users */
+        .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+        .skip-link:focus{left:1rem;top:1rem;width:auto;height:auto;padding:.5rem 1rem;background:#0f172a;color:#fff;border-radius:.375rem;z-index:80}
+
+        /* Header */
+        header{background:transparent}
+        header .container{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+        header h1{margin:0;font-size:1.35rem;color:var(--accent-deep)}
+
+        /* Navigation pills */
+        .nav-btn{padding:.45rem .9rem;border-radius:.6rem;background:transparent;border:0;font-weight:600;color:#475569;cursor:pointer;transition:all .12s ease}
+        .nav-btn:hover{background:#f1f5f9;color:#0f172a}
+        .nav-btn.active{background:linear-gradient(90deg,#eff6ff,#e6f2ff);color:var(--accent-deep);box-shadow:0 8px 28px rgba(37,99,235,0.07)}
+
+        /* Sections */
+        .content-section{display:none}
+        .content-section.active{display:block}
+
+        /* Cards */
+        .stat-card{background:var(--card-bg);padding:1.25rem;border-radius:.9rem;box-shadow:0 10px 30px var(--soft-shadow);border:1px solid rgba(15,23,42,0.03)}
+
+        /* Tabs / Buttons */
+        .tab-btn{display:inline-block;padding:.7rem 1rem;border-radius:.6rem;background:var(--card-bg);border:1px solid #e6e9ef;color:#334155;font-weight:600;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+        .tab-btn:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,23,42,0.04)}
+        .tab-btn.active{background:linear-gradient(90deg,#eff6ff,#e6f2ff);border-color:#bfdbfe;color:var(--accent-deep);box-shadow:0 10px 30px rgba(37,99,235,0.08)}
+
+        /* Chart sizing */
+        .chart-container{position:relative;width:100%;max-width:820px;margin-left:auto;margin-right:auto;height:320px}
+        @media(min-width:768px){.chart-container{height:380px}}
+
+        /* Timeline */
+        .timeline{padding-left:1rem}
+        .timeline-item{position:relative;padding-left:2rem;padding-bottom:1rem}
+        .timeline-item::before{content:'';position:absolute;left:.6rem;top:.4rem;width:10px;height:10px;border-radius:9999px;background:var(--accent)}
+        .timeline-item::after{content:'';position:absolute;left:.85rem;top:1rem;bottom:0;width:2px;background:#e6e6e6}
+        .timeline-item:last-child::after{display:none}
+
+        /* Utilities */
+        .text-muted{color:var(--muted)}
+        .center{text-align:center}
+
+        /* Small helper for the pro-tip line */
+        .pro-tip{margin-top:.75rem;color:var(--muted);max-width:60ch;margin-left:auto;margin-right:auto;text-align:center;font-size:.95rem}
+
+        /* Historical note styling for prominence */
+        .historical-note{background:linear-gradient(135deg,#fef3c7 0%,#fef08a 100%);border:2px solid #fcd34d;border-radius:.75rem;padding:1.25rem;margin-top:1.5rem;color:#78350f;line-height:1.6;font-weight:500}
+        .historical-note::before{content:'📜 ';margin-right:.5rem;font-size:1.15rem}
+
+        footer{border-top:1px solid rgba(15,23,42,0.04)}        @media(max-width:640px){header h1{font-size:1.15rem}.chart-container{height:260px}}
+    </style>
+</head>
+<body class="text-gray-800">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">The State of Encryption</h1>
+            <div id="navigation" class="flex flex-wrap justify-center gap-2">
+                <button class="nav-btn active" data-target="overview">Overview</button>
+                <button class="nav-btn" data-target="techniques">Core Techniques</button>
+                <button class="nav-btn" data-target="states">Data States</button>
+                <button class="nav-btn" data-target="threat">Quantum Threat</button>
+                <button class="nav-btn" data-target="future">Future Solutions</button>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-4 py-8 md:py-12">
+
+        <!-- Overview Section -->
+        <section id="overview" class="content-section active space-y-8">
+                    <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                    Welcome to this interactive report on the state of encryption. This section provides a high-level summary of what encryption is and why it's the bedrock of digital trust. Use the navigation above to explore the core techniques, their applications, and the future challenges shaping this critical field.
+                    </p>
+                    <p class="pro-tip">
+                        Pro tip: design systems for crypto-agility so algorithms can be swapped with minimal disruption when standards (like PQC) advance.
+                    </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">What is Encryption?</h3>
+                    <p class="text-gray-700">
+                        Encryption is the process of converting data from a readable format (plaintext) into an unreadable, encoded format (ciphertext). This is done using a mathematical algorithm and a "key." Only those with the correct key can decrypt the data, converting it back into plaintext. It is the primary method for ensuring data confidentiality.
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Why Does It Matter?</h3>
+                    <p class="text-gray-700">
+                        Encryption protects your most sensitive information. It secures your online banking, keeps your private messages confidential, and protects stored data (like medical records) from being read by unauthorized parties. It is the foundation of privacy, security, and trust on the internet.
+                    </p>
+                </div>
+            </div>
+
+            <div class="stat-card text-center">
+                <h3 class="text-4xl font-bold text-blue-800 mb-2">~95%</h3>
+                <p class="text-gray-600 font-medium">Of web traffic on Google is encrypted using TLS</p>
+                <span class="text-sm text-gray-400">(Source: Google Transparency Report)</span>
+            </div>
+        </section>
+
+        <!-- Core Techniques Section -->
+        <section id="techniques" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                Encryption is not one-size-fits-all. The two primary types, Symmetric and Asymmetric, have different strengths and are used together to secure our digital lives. Click the buttons below to compare them and explore the chart to understand key efficiency.
+            </p>
+
+            <div class="flex justify-center gap-4 mb-4" id="techniques-tabs">
+                <button class="tab-btn active" data-content="tech-symmetric">Symmetric Encryption</button>
+                <button class="tab-btn" data-content="tech-asymmetric">Asymmetric Encryption</button>
+            </div>
+
+            <div id="tech-symmetric-content" class="tech-content space-y-4">
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Symmetric (Private Key) Encryption</h3>
+                    <p class="text-gray-700 mb-4">Uses a <strong>single, shared key</strong> to both encrypt and decrypt data. It is extremely fast and efficient, making it ideal for encrypting large amounts of data (like files, databases, or streaming video).</p>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <span class="font-mono text-gray-600">[Data] → ( <strong class="text-blue-600">Key A</strong> ) → [Encrypted] → ( <strong class="text-blue-600">Key A</strong> ) → [Data]</span>
+                    </div>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Standard Algorithm:</strong> AES (Advanced Encryption Standard)</li>
+                        <li><strong>Challenge:</strong> How do you securely share the single key with the recipient?</li>
+                    </ul>
+                    <div class="historical-note">
+                        <strong>DES & Historical Context:</strong> The Data Encryption Standard (DES) was widely adopted in the 1970s as the primary symmetric cipher. However, its 56-bit effective key is now considered too weak—practical brute-force attacks made it obsolete by the 1990s. Triple DES (3DES) extended DES's life by applying the algorithm three times, but modern standards have phased both out in favor of AES and stronger algorithms.
+                    </div>
+                </div>
+            </div>
+
+            <div id="tech-asymmetric-content" class="tech-content hidden space-y-4">
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Asymmetric (Public Key) Encryption</h3>
+                    <p class="text-gray-700 mb-4">Uses a <strong>pair of keys</strong>: a <strong class="text-green-600">public key</strong> (shared with everyone) and a <strong class="text-red-600">private key</strong> (kept secret). Data encrypted with the public key can *only* be decrypted with the private key. It is much slower than symmetric encryption.</p>
+                    <div class="bg-gray-50 p-4 rounded-lg text-center">
+                        <span class="font-mono text-gray-600">[Data] → ( <strong class="text-green-600">Public Key</strong> ) → [Encrypted] → ( <strong class="text-red-600">Private Key</strong> ) → [Data]</span>
+                    </div>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Standard Algorithms:</strong> RSA, ECC (Elliptic Curve Cryptography)</li>
+                        <li><strong>Use Case:</strong> Solves the key-sharing problem. Used to securely exchange a symmetric key at the start of a session (e.g., in TLS/SSL).</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-4">Key Size vs. Security Level (~128-bit Security)</h2>
+                <p class="text-gray-700 max-w-2xl mx-auto text-center mb-4">This chart shows the key sizes needed for different algorithms to achieve roughly the same level of security. Note the efficiency of ECC (Elliptic Curve) compared to RSA.</p>
+                <div class="chart-container">
+                    <canvas id="keySizeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data States Section -->
+        <section id="states" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                To be effective, data must be encrypted in its three primary states. Click on each state below to see how it's protected and the technologies involved.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="states-diagram">
+                <button class="tab-btn text-center p-6" data-content="state-transit">
+                    <span class="text-3xl">🌐</span>
+                    <span class="block text-xl font-bold mt-2">Data-in-Transit</span>
+                </button>
+                <button class="tab-btn text-center p-6" data-content="state-rest">
+                    <span class="text-3xl">🗄️</span>
+                    <span class="block text-xl font-bold mt-2">Data-at-Rest</span>
+                </button>
+                <button class="tab-btn text-center p-6" data-content="state-use">
+                    <span class="text-3xl">💻</span>
+                    <span class="block text-xl font-bold mt-2">Data-in-Use</span>
+                </button>
+            </div>
+
+            <div id="state-content-container" class="mt-6">
+                <div id="state-default-content" class="text-center text-gray-500">
+                    <p>Select a data state above to learn more.</p>
+                </div>
+                <div id="state-transit-content" class="hidden stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Protecting Data-in-Transit</h3>
+                    <p class="text-gray-700">This is data actively moving between systems, such as browsing a website or sending an email. It is most vulnerable to interception or "man-in-the-middle" attacks while it's on the wire.</p>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Primary Technology:</strong> TLS (Transport Layer Security) 1.3, the successor to SSL.</li>
+                        <li><strong>How it works:</strong> TLS uses asymmetric encryption (RSA/ECC) to authenticate the server and securely exchange a symmetric key (AES), which then encrypts all subsequent traffic.</li>
+                    </ul>
+                </div>
+                <div id="state-rest-content" class="hidden stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Protecting Data-at-Rest</h3>
+                    <p class="text-gray-700">This is data that is not actively moving, such as files stored on a hard drive, in a database, or in a cloud storage bucket. It is vulnerable to physical theft or unauthorized access to the storage system.</p>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Primary Technology:</strong> AES-256</li>
+                        <li><strong>Examples:</strong> Full-Disk Encryption (e.g., BitLocker, FileVault), Transparent Data Encryption (TDE) in databases (e.g., SQL Server, Oracle), S3 bucket encryption.</li>
+                    </ul>
+                </div>
+                <div id="state-use-content" class="hidden stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Protecting Data-in-Use</h3>
+                    <p class="text-gray-700">This is data actively being processed in a computer's memory (RAM). This is the "holy grail" of encryption, as data typically must be decrypted to be processed, making it vulnerable to memory-scraping attacks.</p>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Primary Challenge:</strong> How do you compute on data while it remains encrypted?</li>
+                        <li><strong>Emerging Solution:</strong> Homomorphic Encryption (HE) allows for certain computations (like addition or multiplication) directly on ciphertext. It is very computationally slow but is a major area of research.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quantum Threat Section -->
+        <section id="threat" class="content-section space-y-8">
+                    <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                    The most significant long-term threat to modern encryption comes from quantum computing. This section explains the threat and the global effort to counter it.
+                </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-red-700 mb-3">The Problem: Shor's Algorithm</h3>
+                    <p class="text-gray-700">
+                        Today's asymmetric encryption (RSA, ECC) relies on the fact that it is extremely difficult for classical computers to find the prime factors of very large numbers.
+                        <br><br>
+                        A sufficiently powerful quantum computer running <strong>Shor's Algorithm</strong> will be able to solve this factorization problem easily, rendering all modern asymmetric encryption (and thus TLS, digital signatures, etc.) completely insecure.
+                    </p>
+                    <p class="text-gray-700 mt-4"><strong>Note:</strong> Symmetric encryption (like AES-256) is considered largely safe. It can be broken faster by a quantum computer, but the threat is less severe and can be mitigated by using larger keys.
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">The Response: NIST PQC Standardization</h3>
+                    <p class="text-gray-700 mb-4">
+                        The U.S. National Institute of Standards and Technology (NIST) is leading a global effort to find and standardize "Post-Quantum Cryptography" (PQC) – new asymmetric algorithms that are secure against both classical and quantum computers.
+                    </p>
+                    <div class="timeline">
+                        <div class="timeline-item"><strong class="text-gray-900">2016:</strong> Call for submissions</div>
+                        <div class="timeline-item"><strong class="text-gray-900">2017:</strong> Round 1 (69 candidates)</div>
+                        <div class="timeline-item"><strong class="text-gray-900">2020:</strong> Round 3 (7 finalists)</div>
+                        <div class="timeline-item"><strong class="text-gray-900">2022:</strong> First 4 algorithms selected for standardization</div>
+                        <div class="timeline-item"><strong class="text-gray-900">2024:</strong> Draft standards released</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Solutions Section -->
+        <section id="future" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                The future of encryption is being built now. It's a combination of new quantum-resistant algorithms and entirely new paradigms for secure computation and communication. Click the buttons below to explore the most important emerging solutions.
+            </p>
+
+            <div class="flex justify-center gap-4 mb-4" id="future-tabs">
+                <button class="tab-btn active" data-content="future-pqc">Post-Quantum Cryptography (PQC)</button>
+                <button class="tab-btn" data-content="future-he">Homomorphic Encryption (HE)</button>
+                <button class="tab-btn" data-content="future-qkd">Quantum Key Distribution (QKD)</button>
+            </div>
+
+            <div class="mt-6">
+                <div id="future-pqc-content" class="future-content stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Post-Quantum Cryptography (PQC)</h3>
+                    <p class="text-gray-700">This is the most direct solution to the quantum threat. PQC refers to new asymmetric algorithms that run on classical computers but are based on mathematical problems thought to be hard for *both* classical and quantum computers to solve.</p>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Type:</strong> Software solution (new math).</li>
+                        <li><strong>Example:</strong> CRYSTALS-Kyber (for key exchange, replacing RSA/ECC) and CRYSTALS-Dilithium (for digital signatures).</li>
+                        <li><strong>Status:</strong> NIST draft standards are out. The world is beginning the long, complex process of upgrading systems to be "crypto-agile" and adopt these new standards.</li>
+                    </ul>
+                </div>
+                <div id="future-he-content" class="future-content hidden stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Homomorphic Encryption (HE)</h3>
+                    <p class="text-gray-700">HE allows a third party (like a cloud provider) to perform computations on your encrypted data *without* ever decrypting it. You receive the encrypted result, which you (and only you) can decrypt. This is the solution for the "data-in-use" problem.</p>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Type:</strong> Algorithmic solution for data-in-use.</li>
+                        <li><strong>Challenge:</strong> It is currently extremely slow (1000x-1,000,000x slower than plaintext operations).</li>
+                        <li><strong>Status:</strong> A major area of research. Practical for very specific, simple tasks, but not yet for general-purpose computing.</li>
+                    </ul>
+                </div>
+                <div id="future-qkd-content" class="future-content hidden stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Quantum Key Distribution (QKD)</h3>
+                    <p class="text-gray-700">This is *not* an encryption algorithm. QKD uses the principles of quantum physics to securely exchange a key. It sends single photons (particles of light) over a fiber optic cable. If anyone tries to "eavesdrop" on this transmission, the laws of physics dictate that the very act of observing it will disturb the photons, alerting the sender and receiver.</p>
+                    <ul class="list-disc list-inside mt-4 text-gray-700">
+                        <li><strong>Type:</strong> Hardware solution (new physics).</li>
+                        <li><strong>Use:</strong> Securely generates and shares a symmetric key (like for AES).</li>
+                        <li><strong>Challenge:</strong> Requires dedicated, expensive hardware and is limited by distance (photons get lost over long-distance fiber). It is not a replacement for PQC, but a complementary technology.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-6 text-center text-sm text-gray-500">
+            <p>&copy; 2025 Interactive Report. This is a simulated report for informational purposes.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let keySizeChartInstance = null;
+            
+            function createKeySizeChart() {
+                const ctx = document.getElementById('keySizeChart').getContext('2d');
+                if (keySizeChartInstance) {
+                    keySizeChartInstance.destroy();
+                }
+                keySizeChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['AES', 'ECC', 'RSA'],
+                        datasets: [{
+                            label: 'Key Size (bits) for ~128-bit Security',
+                            data: [128, 256, 2048],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(16, 185, 129, 0.7)',
+                                'rgba(239, 68, 68, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(239, 68, 68, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'logarithmic',
+                                title: {
+                                    display: true,
+                                    text: 'Key Size (bits, log scale)'
+                                },
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        if (value === 128 || value === 256 || value === 2048) {
+                                            return value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const navigation = document.getElementById('navigation');
+            const mainContent = document.getElementById('main-content');
+            const sections = mainContent.querySelectorAll('.content-section');
+            const navButtons = navigation.querySelectorAll('.nav-btn');
+
+            navigation.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON') {
+                    const targetId = e.target.getAttribute('data-target');
+                    
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('data-target') === targetId) {
+                            btn.classList.add('active');
+                        }
+                    });
+
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        }
+                    });
+
+                    if (targetId === 'techniques' && !keySizeChartInstance) {
+                        setTimeout(createKeySizeChart, 0);
+                    }
+                }
+            });
+
+            function setupTabs(containerId, contentClass, defaultContentId = null) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                const tabs = container.querySelectorAll('.tab-btn');
+                const contents = document.querySelectorAll(`.${contentClass}`);
+                
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const contentKey = this.getAttribute('data-content');
+                        
+                        tabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        contents.forEach(content => {
+                            content.classList.add('hidden');
+                            if (content.id === `${contentKey}-content`) {
+                                content.classList.remove('hidden');
+                            }
+                        });
+
+                        if (defaultContentId) {
+                            const defaultEl = document.getElementById(defaultContentId);
+                            if (defaultEl) defaultEl.classList.add('hidden');
+                        }
+                    });
+                });
+            }
+
+            setupTabs('techniques-tabs', 'tech-content');
+            setupTabs('future-tabs', 'future-content');
+
+            const statesDiagram = document.getElementById('states-diagram');
+            const stateContentContainer = document.getElementById('state-content-container');
+            const stateDefaultContent = document.getElementById('state-default-content');
+
+            statesDiagram.addEventListener('click', function(e) {
+                const tab = e.target.closest('.tab-btn');
+                if (!tab) return;
+                
+                const contentKey = tab.getAttribute('data-content');
+                const targetContent = document.getElementById(`${contentKey}-content`);
+
+                statesDiagram.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                stateContentContainer.querySelectorAll('.stat-card').forEach(c => c.classList.add('hidden'));
+                
+                if (stateDefaultContent) {
+                    stateDefaultContent.classList.add('hidden');
+                }
+
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                } else if (stateDefaultContent) {
+                    stateDefaultContent.classList.remove('hidden');
+                }
+            });
+
+            setTimeout(() => {
+                if (document.getElementById('keySizeChart').offsetParent !== null) {
+                    createKeySizeChart();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

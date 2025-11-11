@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The State of Data Security & Privacy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Light neutrals, soft blues/greens, deep blue accent) -->
+    <!-- Application Structure Plan: The SPA uses a thematic, single-page dashboard structure with top navigation (Overview, Key Threats, Regulations, Solutions, Future). This design, chosen over mirroring a linear report, allows users to non-linearly explore topics. The default 'Overview' provides key stats and themes. Other sections use interactive charts and clickable "tab-like" content reveals to manage information density and encourage exploration. This structure is designed for user-driven discovery of the report's key findings. -->
+    <!-- Visualization & Content Choices: 1. Overview Stats (Cost, % Laws): (Goal: Inform) -> HTML/Tailwind Stat Cards. Interaction: None. Justification: High-impact, immediate info. (HTML/Tailwind). 2. Top Attack Vectors: (Goal: Compare) -> Horizontal Bar Chart. Interaction: Tooltip. Justification: Clear comparison of threat prevalence. (Chart.js). 3. Global Reg. Coverage: (Goal: Inform) -> Donut Chart. Interaction: Tooltip. Justification: Simple proportion. (Chart.js). 4. Zero Trust Pillars: (Goal: Organize) -> HTML/Tailwind flex-box diagram. Interaction: None. Justification: Visualizes a core concept without SVG. (HTML/Tailwind). 5. Detailed Text (Threats, Regs, Solutions): (Goal: Organize/Inform) -> JS-powered tabs/accordions. Interaction: Click to show/hide. Justification: Manages text density effectively. (JS). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        /* Base page styling */
+        :root{
+            --bg-1: #f8fafc;
+            --card-bg: #ffffff;
+            --muted: #6b7280;
+            --accent: #2563eb; /* blue-600 */
+            --accent-600: #1e40af;
+            --soft-border: rgba(15,23,42,0.06);
+        }
+
+        html,body{height:100%;}
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            background: linear-gradient(180deg, #fbfdff 0%, var(--bg-1) 100%);
+            color: #111827;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            margin:0;
+            line-height:1.5;
+        }
+
+        /* Skip link for keyboard users */
+        .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+        .skip-link:focus{position:static;width:auto;height:auto;padding:.5rem 1rem;background:#111827;color:#fff;border-radius:.375rem;left:1rem;top:1rem;z-index:60}
+
+        header{background:transparent}
+        header .container{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+        header h1{font-size:1.375rem;margin:0;color:var(--accent-600)}
+
+        /* Navigation buttons (pills) */
+        .nav-btn{
+            padding:.45rem .9rem;
+            font-size:.95rem;
+            font-weight:600;
+            color: #475569;
+            border-radius: .6rem;
+            background:transparent;
+            border: none;
+            cursor:pointer;
+            transition: all .14s ease-in-out;
+        }
+        .nav-btn:hover{background:#f1f5f9;color:#0f172a}
+        .nav-btn.active{background:linear-gradient(90deg,#eff6ff,#e6f2ff);color:var(--accent-600);box-shadow:0 6px 20px rgba(37,99,235,0.08)}
+
+        /* Content sections */
+        .content-section{display:none}
+        .content-section.active{display:block}
+
+        /* Cards */
+        .stat-card{background:var(--card-bg);padding:1.25rem;border-radius:.9rem;box-shadow:0 10px 30px var(--soft-border);border:1px solid rgba(15,23,42,0.03)}
+
+        /* Interactive tabs */
+        .interactive-tab{display:inline-block;padding:.7rem 1rem;text-align:left;font-weight:600;color:#334155;background:var(--card-bg);border:1px solid #e6e9ef;border-radius:.6rem;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,background .12s ease}
+        .interactive-tab:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,23,42,0.04)}
+        .interactive-tab.active{background:linear-gradient(90deg,#eff6ff,#e6f2ff);border-color:#bfdbfe;color:var(--accent-600);box-shadow:0 10px 30px rgba(37,99,235,0.08)}
+
+        /* Chart container */
+        .chart-container{position:relative;width:100%;max-width:820px;margin-left:auto;margin-right:auto;height:320px}
+        @media(min-width:768px){.chart-container{height:380px}}
+
+        /* Utilities */
+        .text-muted{color:var(--muted)}
+        .center{text-align:center}
+
+        footer{border-top:1px solid rgba(15,23,42,0.04)}
+
+        /* Small responsive tweaks */
+        @media(max-width:640px){header h1{font-size:1.15rem}.chart-container{height:260px}}
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">The State of Data Security & Privacy</h1>
+            <div id="navigation" class="flex flex-wrap justify-center gap-2">
+                <button class="nav-btn active" data-target="overview">Overview</button>
+                <button class="nav-btn" data-target="threats">Key Threats</button>
+                <button class="nav-btn" data-target="regulations">Regulations</button>
+                <button class="nav-btn" data-target="solutions">Solutions</button>
+                <button class="nav-btn" data-target="future">Future Outlook</button>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-4 py-8 md:py-12">
+
+        <!-- Overview Section -->
+        <section id="overview" class="content-section active space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                Welcome to this interactive report on the current state of data security and privacy. This section provides a high-level overview of the key findings, including critical statistics and the core themes defining today's landscape. Use the navigation above to dive deeper into specific topics.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="stat-card text-center">
+                    <h3 class="text-4xl font-bold text-blue-800 mb-2">$4.45M</h3>
+                    <p class="text-gray-600 font-medium">Average Cost of a Data Breach</p>
+                    <span class="text-sm text-gray-400">(Source: IBM Report 2023)</span>
+                </div>
+                <div class="stat-card text-center">
+                    <h3 class="text-4xl font-bold text-blue-800 mb-2">71%</h3>
+                    <p class="text-gray-600 font-medium">Countries with Data Privacy Laws</p>
+                    <span class="text-sm text-gray-400">(Source: UNCTAD)</span>
+                </div>
+                <div class="stat-card text-center">
+                    <h3 class="text-4xl font-bold text-blue-800 mb-2">94%</h3>
+                    <p class="text-gray-600 font-medium">Orgs. with Cloud Security Concerns</p>
+                    <span class="text-sm text-gray-400">(Source: 2023 Cloud Security Report)</span>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Key Interactive Themes</h2>
+                <p class="text-gray-700 max-w-3xl mx-auto text-center mb-6">
+                    The data privacy landscape is shaped by several powerful, interconnected forces. Click on each theme below to learn more about its impact and relevance.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button class="interactive-tab" data-content="theme-ai">AI's Dual Role</button>
+                    <button class="interactive-tab" data-content="theme-regs">Regulatory Patchwork</button>
+                    <button class="interactive-tab" data-content="theme-zt">Zero Trust Imperative</button>
+                </div>
+                <div id="theme-content" class="mt-6 bg-white p-6 rounded-lg shadow-md border border-gray-100 min-h-[100px]">
+                    <p class="text-gray-600 text-center">Select a theme above to see details.</p>
+                </div>
+                <div id="theme-ai-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">AI's Dual Role: Threat and Defender</h4>
+                    <p class="text-gray-700">Artificial Intelligence is a double-edged sword. Attackers use AI to create sophisticated phishing emails, generate polymorphic malware, and automate vulnerability discovery. Conversely, defenders use AI for advanced threat detection, anomaly analysis, and to automate incident response, leading an ongoing technological arms race.</p>
+                </div>
+                <div id="theme-regs-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">The Expanding Regulatory Patchwork</h4>
+                    <p class="text-gray-700">The global regulatory landscape is becoming increasingly complex. Following the GDPR, nations worldwide are enacting their own laws (e.g., CCPA/CPRA in California, LGPD in Brazil, PDPA in India). This creates significant compliance challenges for multinational organizations, forcing them to adopt adaptable, "global-first" privacy frameworks.</p>
+                </div>
+                <div id="theme-zt-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">The Zero Trust Imperative</h4>
+                    <p class="text-gray-700">The dissolution of the traditional network perimeter, accelerated by remote work and cloud adoption, has rendered "trust-but-verify" models obsolete. Zero Trust Architecture (ZTA) is now a strategic imperative. It operates on the principle of "never trust, always verify," requiring strict authentication and authorization for every user and device, both inside and outside the network.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Threats Section -->
+        <section id="threats" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                The threat landscape is constantly evolving. This section explores the most prominent attack vectors and emerging threats organizations face today. Interact with the chart to see common vectors and click the buttons below to explore specific threat categories in detail.
+            </p>
+            
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-4">Top Attack Vectors</h2>
+                <div class="chart-container">
+                    <canvas id="threatsChart"></canvas>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Threat Deep Dive</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <button class="interactive-tab" data-content="threat-ransomware">Ransomware Evolution</button>
+                    <button class="interactive-tab" data-content="threat-supply">Supply Chain Attacks</button>
+                    <button class="interactive-tab" data-content="threat-iot">IoT/OT Vulnerabilities</button>
+                    <button class="interactive-tab" data-content="threat-phishing">Advanced Phishing</button>
+                </div>
+                <div id="threat-content" class="mt-6 bg-white p-6 rounded-lg shadow-md border border-gray-100 min-h-[100px]">
+                    <p class="text-gray-600 text-center">Select a threat above to see details.</p>
+                </div>
+                <div id="threat-ransomware-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">Ransomware Evolution</h4>
+                    <p class="text-gray-700">Ransomware has moved beyond simple encryption. Modern attacks involve "double extortion" (stealing data before encrypting it, threatening to leak it) and "triple extortion" (adding DDoS attacks or harassing victims' customers). Ransomware-as-a-Service (RaaS) models on the dark web have lowered the barrier to entry, increasing the volume of attacks.</p>
+                </div>
+                <div id="threat-supply-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">Supply Chain Attacks</h4>
+                    <p class="text-gray-700">Attackers are increasingly targeting the software supply chain. By compromising a single trusted vendor or an open-source library (e.g., the SolarWinds or Log4j incidents), attackers can gain access to thousands of downstream organizations. This "one-to-many" attack vector is highly efficient and difficult to defend against.</p>
+                </div>
+                <div id="threat-iot-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">IoT/OT Vulnerabilities</h4>
+                    <p class="text-gray-700">The explosion of Internet of Things (IoT) devices in homes and businesses, and Operational Technology (OT) in critical infrastructure, has created a vast new attack surface. Many ofthese devices are built with poor security, lack update mechanisms, and provide a gateway for attackers to pivot into more secure corporate networks.</p>
+                </div>
+                <div id="threat-phishing-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">Advanced Phishing & Social Engineering</h4>
+                    <p class="text-gray-700">Phishing remains a primary initial access vector. It has evolved from simple email spam to highly targeted "spear-phishing," "whaling" (targeting executives), and "vishing" (voice phishing). AI-generated content and deepfakes are making these attacks more convincing and harder to detect than ever.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Regulations Section -->
+        <section id="regulations" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                Data privacy legislation is a driving force in security. This section visualizes the global spread of these laws and provides summaries of the most impactful regulations. Click the buttons to explore the frameworks shaping global data handling.
+            </p>
+
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-4">Global Data Privacy Law Coverage</h2>
+                <div class="chart-container">
+                    <canvas id="regulationsChart"></canvas>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Key Regulatory Frameworks</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <button class="interactive-tab" data-content="reg-gdpr">GDPR (Europe)</button>
+                    <button class="interactive-tab" data-content="reg-ccpa">CCPA / CPRA (California)</button>
+                    <button class="interactive-tab" data-content="reg-trends">Global Trends</button>
+                </div>
+                <div id="reg-content" class="mt-6 bg-white p-6 rounded-lg shadow-md border border-gray-100 min-h-[100px]">
+                    <p class="text-gray-600 text-center">Select a framework above to see details.</p>
+                </div>
+                <div id="reg-gdpr-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">GDPR (General Data Protection Regulation)</h4>
+                    <p class="text-gray-700">The EU's GDPR is the global benchmark for data privacy. It establishes strong data subject rights (e.g., Right to Erasure, Right to Portability), requires a "privacy by design" approach, mandates data protection officers (DPOs) for many firms, and imposes severe fines for non-compliance (up to 4% of global annual revenue). Its extra-territorial reach affects any company worldwide that processes EU residents' data.</p>
+                </div>
+                <div id="reg-ccpa-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">CCPA / CPRA (California)</h4>
+                    <p class="text-gray-700">The California Consumer Privacy Act (CCPA) and its successor, the California Privacy Rights Act (CPRA), are the most comprehensive state-level privacy laws in the U.S. They give consumers the right to know what data is collected, the right to delete it, and the right to opt-out of the "sale" or "sharing" of their personal information. The CPRA established the first dedicated privacy enforcement agency in the U.S.</p>
+                </div>
+                <div id="reg-trends-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">Global Trends (LGPD, PDPA, etc.)</h4>
+                    <p class="text-gray-700">Many countries have followed the GDPR's lead. Brazil's LGPD, India's Digital Personal Data Protection Act (DPDPA), and various laws in Asia and Africa are creating a global tapestry of privacy regulations. While they share core principles (consent, data minimization), differences in consent requirements, data transfer rules, and enforcement create a complex compliance map for global businesses.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solutions Section -->
+        <section id="solutions" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                In response to these threats, organizations are adopting new security models and technologies. This section explores key defensive strategies, from architectural principles like Zero Trust to Privacy-Enhancing Technologies (PETs).
+            </p>
+
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Core Concept: Zero Trust Architecture</h2>
+                <p class="text-gray-700 max-w-2xl mx-auto text-center mb-6">
+                    Zero Trust is a security model based on the principle of "never trust, always verify." It assumes no user or device is trusted by default, requiring continuous verification.
+                </p>
+                <div class="flex flex-col md:flex-row gap-4 justify-center">
+                    <div class="flex-1 stat-card text-center">
+                        <span class="text-4xl">🛡️</span>
+                        <h4 class="text-lg font-bold mt-2">Verify Explicitly</h4>
+                        <p class="text-sm text-gray-600">Always authenticate and authorize based on all available data points.</p>
+                    </div>
+                    <div class="flex-1 stat-card text-center">
+                        <span class="text-4xl">🔒</span>
+                        <h4 class="text-lg font-bold mt-2">Use Least Privilege</h4>
+                        <p class="text-sm text-gray-600">Grant users only the access they need, for the time they need it (Just-in-Time).</p>
+                    </div>
+                    <div class="flex-1 stat-card text-center">
+                        <span class="text-4xl">🚨</span>
+                        <h4 class="text-lg font-bold mt-2">Assume Breach</h4>
+                        <p class="text-sm text-gray-600">Minimize blast radius by segmenting networks, encrypting data, and monitoring all traffic.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">Emerging Technologies & Strategies</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <button class="interactive-tab" data-content="sol-pets">Privacy-Enhancing Tech</button>
+                    <button class="interactive-tab" data-content="sol-ai">AI in Defense</button>
+                    <button class="interactive-tab" data-content="sol-cloud">Cloud Security (CSPM)</button>
+                </div>
+                <div id="sol-content" class="mt-6 bg-white p-6 rounded-lg shadow-md border border-gray-100 min-h-[100px]">
+                    <p class="text-gray-600 text-center">Select a technology above to see details.</p>
+                </div>
+                <div id="sol-pets-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">Privacy-Enhancing Technologies (PETs)</h4>
+                    <p class="text-gray-700">PETs are technologies that enable data to be used and analyzed without exposing sensitive personal information. Examples include Homomorphic Encryption (computing on encrypted data), Differential Privacy (adding statistical "noise" to datasets), and Federated Learning (training AI models locally without centralizing raw data). PETs are key to balancing innovation with privacy.</p>
+                </div>
+                <div id="sol-ai-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">AI in Defense</h4>
+                    <p class="text-gray-700">On the defensive side, AI and Machine Learning are critical. Security Orchestration, Automation, and Response (SOAR) platforms use AI to automate responses to common alerts. User and Entity Behavior Analytics (UEBA) systems model normal behavior to detect anomalies (like a compromised account) that traditional, rule-based systems would miss.</p>
+                </div>
+                <div id="sol-cloud-content" class="hidden">
+                    <h4 class="text-lg font-bold mb-2">Cloud Security Posture Management (CSPM)</h4>
+                    <p class="text-gray-700">With most organizations using multiple clouds, misconfigurations are a leading cause of breaches. CSPM tools continuously scan cloud environments for misconfigured settings, policy violations, and compliance risks. They provide a unified view of risk across AWS, Azure, GCP, and other platforms, and often automate remediation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Outlook Section -->
+        <section id="future" class="content-section space-y-8">
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
+                Looking ahead, new technologies will introduce both unprecedented challenges and innovative solutions. This final section explores the long-term trends that will shape the future of data security and privacy.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">The Quantum Threat</h3>
+                    <p class="text-gray-700">
+                        Shor's algorithm, a quantum computing algorithm, will one day be able to break most of the public-key cryptography (like RSA and ECC) that protects our data today. The race is on to develop and standardize "post-quantum cryptography" (PQC) – new encryption algorithms that are secure against attacks from both classical and quantum computers. This is a long-term, fundamental shift for all digital security.
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Decentralized & Self-Sovereign Identity</h3>
+                    <p class="text-gray-700">
+                        The current model of identity, where users rely on centralized providers (like Google, or government databases), is fragile. The future points toward Self-Sovereign Identity (SSI), where individuals control their own identity data in a personal digital "wallet." They can then use "verifiable credentials" to prove specific attributes (e.g., "I am over 21") without revealing all their personal information, enhancing privacy and security.
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">Data Sovereignty & Localization</h3>
+                    <p class="text-gray-700">
+                        In addition to privacy, nations are increasingly concerned with data *sovereignty* – the idea that data is subject to the laws of the country in which it is located. This is leading to a rise in data localization laws that mandate data about a country's citizens must be stored and processed within its borders. This trend, known as "splinternet," complicates global operations and cloud architecture.
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-xl font-bold text-blue-800 mb-3">The Rise of Data Ethics</h3>
+                    <p class="text-gray-700">
+                        Beyond just legal compliance, companies are facing growing pressure to be *ethically* responsible with data. This includes questions of fairness and bias in AI algorithms, transparency in data usage, and the societal impact of data-driven products. A strong "data ethics" framework is becoming as important as a legal one to maintain customer trust and brand reputation.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-6 text-center text-sm text-gray-500">
+            <p>&copy; 2025 Interactive Report. This is a simulated report for informational purposes.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = {
+                threats: {
+                    labels: ['Phishing / Social Eng.', 'Stolen Credentials', 'Cloud Misconfiguration', 'Software Vulnerability', 'Ransomware', 'Internal Actor'],
+                    data: [31, 24, 15, 12, 10, 8]
+                },
+                regulations: {
+                    labels: ['Countries with Legislation (71%)', 'Countries without (29%)'],
+                    data: [71, 29]
+                }
+            };
+        
+            let threatsChartInstance = null;
+            let regulationsChartInstance = null;
+
+            function createThreatsChart() {
+                const ctx = document.getElementById('threatsChart').getContext('2d');
+                if (threatsChartInstance) {
+                    threatsChartInstance.destroy();
+                }
+                threatsChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.threats.labels.map(label => label.length > 16 ? label.match(/.{1,16}/g) : label),
+                        datasets: [{
+                            label: 'Prevalence (%)',
+                            data: chartData.threats.data,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const label = context[0].label;
+                                        return Array.isArray(label) ? label.join('') : label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Prevalence (%)'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    autoSkip: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createRegulationsChart() {
+                const ctx = document.getElementById('regulationsChart').getContext('2d');
+                if (regulationsChartInstance) {
+                    regulationsChartInstance.destroy();
+                }
+                regulationsChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.regulations.labels,
+                        datasets: [{
+                            data: chartData.regulations.data,
+                            backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(209, 213, 219, 0.7)'],
+                            borderColor: ['rgba(59, 130, 246, 1)', 'rgba(209, 213, 219, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` ${context.label}: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const navigation = document.getElementById('navigation');
+            const mainContent = document.getElementById('main-content');
+            const sections = mainContent.querySelectorAll('.content-section');
+            const navButtons = navigation.querySelectorAll('.nav-btn');
+
+            navigation.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON') {
+                    const targetId = e.target.getAttribute('data-target');
+                    
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('data-target') === targetId) {
+                            btn.classList.add('active');
+                        }
+                    });
+
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        }
+                    });
+
+                    if (targetId === 'threats' && !threatsChartInstance) {
+                        setTimeout(createThreatsChart, 0);
+                    }
+                    if (targetId === 'regulations' && !regulationsChartInstance) {
+                        setTimeout(createRegulationsChart, 0);
+                    }
+                }
+            });
+
+            function setupInteractiveTabs(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                const tabs = container.querySelectorAll('.interactive-tab');
+                const contentContainer = container.querySelector('[id$="-content"]');
+                const defaultContent = contentContainer.innerHTML;
+                
+                const hiddenContents = {};
+                container.querySelectorAll('[id$="-content"][class*="hidden"]').forEach(el => {
+                    hiddenContents[el.id.replace('-content', '')] = el.innerHTML;
+                });
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const contentKey = this.getAttribute('data-content');
+                        
+                        tabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        const contentId = `${contentKey}-content`;
+                        const hiddenContent = container.querySelector(`#${contentId}`);
+
+                        if (hiddenContent) {
+                            contentContainer.innerHTML = hiddenContent.innerHTML;
+                        } else {
+                            contentContainer.innerHTML = defaultContent;
+                        }
+                    });
+                });
+            }
+
+            setupInteractiveTabs('overview');
+            setupInteractiveTabs('threats');
+            setupInteractiveTabs('regulations');
+            setupInteractiveTabs('solutions');
+
+            createRegulationsChart();
+            setTimeout(() => {
+                if (document.getElementById('threatsChart').offsetParent !== null) {
+                    createThreatsChart();
+                }
+                if (document.getElementById('regulationsChart').offsetParent !== null) {
+                    createRegulationsChart();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

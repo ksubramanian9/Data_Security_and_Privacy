@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Encryption Teaching Simulator — Tabs (DES • AES • RSA • ECC)</title>
+<style>
+  :root {
+    --bg:#0f1724; --card:#0b1220; --muted:#b8c3cc; --accent:#6ee7b7; --glass: rgba(255,255,255,0.05);
+    --panel-pad:18px;
+    --radius:16px;
+    --font-base:18.5px;
+    --font-small:15px;
+    --font-code:17px;
+    --svg-h:340px;
+    --layout-w:1400px;
+  }
+  html,body { height:100%; margin:0; background:linear-gradient(180deg,#071021 0%, #091432 100%); color:#eef5fb; font-family: Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto; font-size: var(--font-base);}
+  header { padding:28px 22px; display:flex; gap:18px; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.06); max-width:var(--layout-w); margin:0 auto;}
+  header h1 { margin:0; font-size: 28px; letter-spacing:0.2px; }
+  header p { margin:4px 0 0 0; color:var(--muted); font-size: 16px; }
+  .container { padding:20px; max-width: var(--layout-w); margin:0 auto; }
+  .card { background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+          border-radius: var(--radius); padding: var(--panel-pad); box-shadow: 0 10px 26px rgba(2,6,23,0.55); border:1px solid rgba(255,255,255,0.08); }
+  .row { display:flex; gap:12px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+  label { display:block; font-size: 16px; color:var(--muted); margin-bottom:8px; }
+  textarea, input[type="text"], select {
+    width:100%; padding:14px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12);
+    background:var(--glass); color:#eef5fb; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", monospace;
+    font-size: var(--font-code); box-sizing:border-box;
+  }
+  button { background:linear-gradient(90deg,var(--accent),#3dd5c1); color:#062; border:0; padding:12px 14px; border-radius:12px; font-weight:700; cursor:pointer; font-size: 16px; }
+  button.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:#e1eef5;}
+  button.small { padding:9px 12px; font-size: 15px;}
+  pre { background: rgba(0,0,0,0.22); padding:14px; border-radius:12px; font-size: var(--font-code); overflow:auto; color:#e6eef6; }
+  .svg-area { width:100%; height: var(--svg-h); display:block; background:linear-gradient(90deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04)); border-radius:12px; padding:10px; box-sizing:border-box; }
+  .muted { color:var(--muted); }
+  .kbd { background:#0a2138; border-radius:10px; padding:6px 10px; font-family: ui-monospace, monospace; font-size: var(--font-code); color:#d6f5ee; border:1px solid rgba(255,255,255,0.12); }
+  footer { padding:18px; color:var(--muted); font-size: 15px; text-align:center; }
+
+  /* Tabs */
+  .tabs { margin-top:18px; }
+  .tablist {
+    display:flex; gap:10px; flex-wrap:wrap;
+    background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10);
+    padding:10px; border-radius: 999px;
+  }
+  .tab {
+    appearance:none; border:0; cursor:pointer; border-radius:999px; padding:10px 16px; font-weight:700; font-size:18px;
+    color:#cfe9e2; background:transparent; border:1px solid transparent;
+  }
+  .tab[aria-selected="true"] { background:linear-gradient(90deg,var(--accent),#56e7d7); color:#042; }
+  .tabpanel { margin-top:16px; }
+  .hidden { display:none !important; }
+
+  /* Larger headings in panels */
+  h3 { font-size: 22px; margin:0 0 6px 0; }
+  details summary { cursor:pointer; font-size: 16px; }
+  .pill { background:rgba(255,255,255,0.09); padding:8px 12px; border-radius:999px; font-size: 15px; color:#d9e6f0; border:1px solid rgba(255,255,255,0.12); }
+
+  /* Responsive */
+  @media (max-width: 1100px){
+    :root { --svg-h: 300px; }
+  }
+  @media (max-width: 780px){
+    :root { --font-base:17px; --svg-h: 280px; }
+    header { padding:20px 16px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Encryption Teaching Simulator</h1>
+    <p class="muted">Tabbed UI • Large fonts • High-contrast visuals • Toy DES visualizer • Real AES/RSA/ECC via Web Crypto</p>
+  </div>
+  <div style="margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;">
+    <div class="pill">Local-only</div>
+    <div class="pill">Educational</div>
+    <div class="pill">Web Crypto</div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- TABS -->
+  <nav class="tabs card" role="tablist" aria-label="Encryption algorithms" id="tablist">
+    <button class="tab" role="tab" id="tab-des" aria-controls="panel-des" aria-selected="true">DES (Toy)</button>
+    <button class="tab" role="tab" id="tab-aes" aria-controls="panel-aes" aria-selected="false">AES (GCM)</button>
+    <button class="tab" role="tab" id="tab-rsa" aria-controls="panel-rsa" aria-selected="false">RSA-OAEP</button>
+    <button class="tab" role="tab" id="tab-ecc" aria-controls="panel-ecc" aria-selected="false">ECC (ECDH)</button>
+    <div style="margin-left:auto" class="muted" aria-hidden="true">Use <span class="kbd">←/→</span> to switch tabs</div>
+  </nav>
+
+  <!-- DES PANEL -->
+  <section id="panel-des" class="tabpanel card" role="tabpanel" aria-labelledby="tab-des">
+    <h3>Toy DES — Feistel round visualizer (educational)</h3>
+    <p class="muted">Tiny 8-bit block, 2-round Feistel cipher to demonstrate expansion, XOR with subkeys, S-box, and swap. <strong>Not secure</strong> — for teaching only.</p>
+    <div class="row" style="margin-top:6px;">
+      <label style="flex:1">
+        Plain (8-bit binary)
+        <input id="des-plain" type="text" value="10101100" />
+      </label>
+      <label style="width:220px">
+        Key (8-bit)
+        <input id="des-key" type="text" value="01010111" />
+      </label>
+    </div>
+    <div class="row">
+      <button id="des-run">Run Toy DES</button>
+      <button id="des-step" class="ghost small">Step</button>
+      <button id="des-random" class="ghost small">Random</button>
+      <div class="muted" style="margin-left:auto">Output: <span id="des-output" class="kbd">—</span></div>
+    </div>
+    <div style="margin-top:12px;">
+      <svg id="des-svg" class="svg-area" viewBox="0 0 1000 360" preserveAspectRatio="xMidYMid meet" aria-label="DES visualization"></svg>
+    </div>
+    <details style="margin-top:12px">
+      <summary class="muted">How this toy DES works</summary>
+      <p class="muted">Split 8-bit block into L(4) and R(4), run 2 Feistel rounds: expand R (4→6), XOR with subkey (derived by toy rotations),
+        S-box (two tiny S-boxes), XOR with L to form new R, then swap. Decryption mirrors the same steps in reverse.</p>
+    </details>
+  </section>
+
+  <!-- AES PANEL -->
+  <section id="panel-aes" class="tabpanel card hidden" role="tabpanel" aria-labelledby="tab-aes" tabindex="0">
+    <h3>AES (WebCrypto AES-GCM) + Round Visualizer</h3>
+    <p class="muted">Uses SubtleCrypto for real AES-GCM. Visualizer shows simplified block-round ideas (toy SubBytes/ShiftRows/MixColumns) for teaching.</p>
+    <label>Plaintext (UTF-8)</label>
+    <textarea id="aes-plain" rows="4">Hello AES demo!</textarea>
+    <div class="row">
+      <label style="flex:1">
+        Key (hex 128-bit) — <span id="aes-keyhint" class="muted">will be generated</span>
+        <input id="aes-keyhex" type="text" placeholder="Generate or paste 32 hex chars" />
+      </label>
+      <button id="aes-gen" class="small">Generate Key</button>
+    </div>
+    <div class="row">
+      <button id="aes-encrypt">Encrypt (AES-GCM)</button>
+      <button id="aes-decrypt" class="ghost">Decrypt</button>
+      <button id="aes-step" class="ghost small">Show round steps (visual)</button>
+      <div style="margin-left:auto;" class="muted">Cipher: <span id="aes-cipher-kbd" class="kbd">—</span></div>
+    </div>
+    <div style="margin-top:12px;">
+      <svg id="aes-svg" class="svg-area" viewBox="0 0 1000 360" preserveAspectRatio="xMidYMid meet" aria-label="AES visualization"></svg>
+    </div>
+    <pre id="aes-log" style="margin-top:12px; height:130px;"></pre>
+  </section>
+
+  <!-- RSA PANEL -->
+  <section id="panel-rsa" class="tabpanel card hidden" role="tabpanel" aria-labelledby="tab-rsa" tabindex="0">
+    <h3>RSA-OAEP (WebCrypto)</h3>
+    <p class="muted">Generate RSA-2048 key pair, encrypt with public key, decrypt with private key.</p>
+    <div class="row">
+      <button id="rsa-gen">Generate RSA-2048 Keypair</button>
+      <button id="rsa-export" class="ghost">Export public (PEM)</button>
+      <div style="margin-left:auto;" class="muted">PubKey: <span id="rsa-status" class="kbd">none</span></div>
+    </div>
+    <label style="margin-top:8px">Plaintext (UTF-8)</label>
+    <input id="rsa-plain" type="text" value="RSA test message" />
+    <div class="row">
+      <button id="rsa-encrypt">Encrypt</button>
+      <button id="rsa-decrypt" class="ghost">Decrypt</button>
+      <div style="margin-left:auto" class="muted">Cipher (Base64): <span id="rsa-cipher" class="kbd">—</span></div>
+    </div>
+    <pre id="rsa-log" style="margin-top:12px; min-height:120px;"></pre>
+  </section>
+
+  <!-- ECC PANEL -->
+  <section id="panel-ecc" class="tabpanel card hidden" role="tabpanel" aria-labelledby="tab-ecc" tabindex="0">
+    <h3>ECC (ECDH) Key Agreement + AES test</h3>
+    <p class="muted">Generate two P-256 keypairs, derive shared secret both sides, HKDF to AES key, encrypt with A and decrypt with B to verify match.</p>
+    <div class="row">
+      <button id="ecc-gen">Generate two ECDH keys</button>
+      <button id="ecc-derive" class="ghost">Derive shared secrets & test</button>
+      <div style="margin-left:auto" class="muted">Status: <span id="ecc-status" class="kbd">idle</span></div>
+    </div>
+    <label style="margin-top:8px">Test message</label>
+    <input id="ecc-plain" type="text" value="ECDH -> AES test" />
+    <pre id="ecc-log" style="margin-top:12px; min-height:140px;"></pre>
+  </section>
+
+  <section class="card" style="margin-top:14px;">
+    <div class="row">
+      <h3 style="margin:0;">Notes & teaching tips</h3>
+      <button id="download-all" class="ghost small" style="margin-left:auto">Download this page</button>
+    </div>
+    <ul class="muted">
+      <li>DES: older Feistel cipher; shown here as a small toy to visualize rounds. Do not use in production.</li>
+      <li>AES: 128-bit block cipher; real crypto via WebCrypto AES-GCM; toy visuals simplify round ideas.</li>
+      <li>RSA: public/private; OAEP used for encryption of small messages/keys; 2048+ bits recommended.</li>
+      <li>ECC: smaller keys, ECDH for agreement; derive symmetric key (HKDF) and use AES for confidentiality.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Built for classrooms • Big fonts & high contrast for projector use • All operations run locally in your browser
+  </footer>
+</main>
+
+<script>
+/* ---------------------------
+  Tabs: ARIA + keyboard navigation
+---------------------------*/
+(function(){
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const panels = {
+    'tab-des': document.getElementById('panel-des'),
+    'tab-aes': document.getElementById('panel-aes'),
+    'tab-rsa': document.getElementById('panel-rsa'),
+    'tab-ecc': document.getElementById('panel-ecc'),
+  };
+  function activate(id){
+    tabs.forEach(t=>{
+      const sel = (t.id===id);
+      t.setAttribute('aria-selected', sel ? 'true' : 'false');
+      panels[t.id].classList.toggle('hidden', !sel);
+      if(sel) panels[t.id].focus({preventScroll:true});
+    });
+  }
+  tabs.forEach(t => t.addEventListener('click', ()=> activate(t.id)));
+  // Arrow navigation
+  document.getElementById('tablist').addEventListener('keydown', (e)=>{
+    if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
+    e.preventDefault();
+    const idx = tabs.findIndex(t=>t.getAttribute('aria-selected')==='true');
+    const next = e.key==='ArrowRight' ? (idx+1)%tabs.length : (idx-1+tabs.length)%tabs.length;
+    tabs[next].focus();
+    activate(tabs[next].id);
+  });
+  // default active is DES
+  activate('tab-des');
+})();
+
+/* ---------------------------
+  Helpers
+---------------------------*/
+function hexToBytes(hex){ const res = new Uint8Array(hex.match(/.{1,2}/g)?.map(b => parseInt(b,16))||[]); return res; }
+function bytesToHex(b){ return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+function utf8ToBytes(s){ return new TextEncoder().encode(s); }
+function bytesToUtf8(b){ return new TextDecoder().decode(b); }
+function b64Enc(arr){ return btoa(String.fromCharCode(...arr)); }
+function randBits(n){ return Math.floor(Math.random()* (1<<n)); }
+function assertBinStr(s,len){ return /^[01]+$/.test(s) && s.length===len; }
+
+/* ---------------------------
+  Toy DES (educational)
+---------------------------*/
+const DES = (function(){
+  const S1 = [0,1,3,2,3,2,0,1]; // toy S-boxes (3->2 bits)
+  const S2 = [3,0,1,2,0,2,3,1];
+  const expand4to6 = b => [b[3], b[0], b[1], b[2], b[1], b[3]];
+  const sbox = a6 => {
+    const a = (a6[0]<<2)|(a6[1]<<1)|a6[2], b=(a6[3]<<2)|(a6[4]<<1)|a6[5];
+    const o1=S1[a], o2=S2[b];
+    return [(o1>>1)&1, o1&1, (o2>>1)&1, o2&1];
+  };
+  const keySchedule8 = k8 => {
+    const k = k8.split('').map(c=>+c);
+    const r1 = k.slice(1).concat(k.slice(0,1));
+    const r2 = k.slice(2).concat(k.slice(0,2));
+    return [r1.slice(0,6), r2.slice(0,6)];
+  };
+  const xor = (a,b)=> a.map((v,i)=>v^b[i]);
+  const strToBits = s => s.split('').map(c=>+c);
+  const bitsToStr = a => a.join('');
+
+  function runBlock(plain8, key8){
+    if(!assertBinStr(plain8,8) || !assertBinStr(key8,8)) throw new Error("Expect 8-bit binary strings");
+    const bits = strToBits(plain8);
+    let L=bits.slice(0,4), R=bits.slice(4,8);
+    const ks = keySchedule8(key8);
+    const trace=[];
+    for(let r=0;r<2;r++){
+      const E = expand4to6(R);
+      const x = xor(E, ks[r]);
+      const s = sbox(x);
+      const newR = xor(L, s);
+      trace.push({round:r+1,L:[...L],R:[...R],E:x.map((_v,i)=>E[i]),subkey:ks[r],xor:x,sOut:s,newR});
+      L = R; R = newR;
+    }
+    return {cipher: bitsToStr(L.concat(R)), trace};
+  }
+  return {runBlock};
+})();
+
+/* ---------------------------
+  DES UI & SVG
+---------------------------*/
+(function(){
+  const svg = document.getElementById('des-svg');
+  const runBtn = document.getElementById('des-run');
+  const stepBtn = document.getElementById('des-step');
+  const randomBtn = document.getElementById('des-random');
+  const plainInput = document.getElementById('des-plain');
+  const keyInput = document.getElementById('des-key');
+  const outputSpan = document.getElementById('des-output');
+
+  function addText(x,y,t,size=16, color='#e8fff8'){
+    const el = document.createElementNS('http://www.w3.org/2000/svg','text');
+    el.setAttribute('x',x); el.setAttribute('y',y); el.setAttribute('fill',color);
+    el.setAttribute('font-family','ui-monospace, monospace'); el.setAttribute('font-size',size); el.textContent = t;
+    svg.appendChild(el);
+  }
+  function renderTrace(trace, cipher){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    const startX=24, startY=40, boxW=300, boxH=90, gap=260;
+    addText(startX, 24, 'Input L(4) | R(4)', 17);
+    addText(startX, 48, trace[0].L.join('') + ' | ' + trace[0].R.join(''), 20);
+    trace.forEach((t,i)=>{
+      const x = startX + (i+1)*gap, y = startY;
+      const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y); rect.setAttribute('width', boxW); rect.setAttribute('height', boxH);
+      rect.setAttribute('rx',12); rect.setAttribute('fill','rgba(255,255,255,0.08)'); rect.setAttribute('stroke','rgba(255,255,255,0.25)');
+      svg.appendChild(rect);
+      addText(x+12, y+26, `Round ${t.round}`, 18);
+      addText(x+12, y+48, `L=${t.L.join('')}  R=${t.R.join('')}`, 16);
+      addText(x+12, y+70, `E=${t.E.join('')}  k=${t.subkey.join('')}`, 16);
+      addText(x+154, y+48, `sOut=${t.sOut.join('')}  newR=${t.newR.join('')}`, 16);
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', x-12); line.setAttribute('y1', y+boxH/2); line.setAttribute('x2', x); line.setAttribute('y2', y+boxH/2);
+      line.setAttribute('stroke','rgba(255,255,255,0.35)'); line.setAttribute('stroke-width',3); svg.appendChild(line);
+    });
+    addText(startX + (trace.length+1)*gap, 24, 'Output L|R', 17);
+    addText(startX + (trace.length+1)*gap, 48, cipher, 22);
+  }
+  function runFull(){
+    try{
+      const p=plainInput.value.trim(), k=keyInput.value.trim();
+      if(!assertBinStr(p,8) || !assertBinStr(k,8)){ alert('Enter 8-bit binary strings (e.g., 10101100).'); return; }
+      const {cipher, trace} = DES.runBlock(p,k);
+      outputSpan.textContent = cipher;
+      renderTrace(trace, cipher);
+    }catch(e){ alert(e.message); console.error(e); }
+  }
+  runBtn.addEventListener('click', runFull);
+  randomBtn.addEventListener('click', ()=>{
+    const p = ('00000000' + randBits(8).toString(2)).slice(-8);
+    const k = ('00000000' + randBits(8).toString(2)).slice(-8);
+    plainInput.value = p; keyInput.value = k; runFull();
+  });
+  stepBtn.addEventListener('click', async ()=>{
+    try{
+      const p=plainInput.value.trim(), k=keyInput.value.trim();
+      if(!assertBinStr(p,8) || !assertBinStr(k,8)){ alert('Enter 8-bit binary strings'); return;}
+      const {cipher, trace} = DES.runBlock(p,k); outputSpan.textContent = cipher;
+      while(svg.firstChild) svg.removeChild(svg.firstChild);
+      const lines = [
+        `Input: ${p.slice(0,4)} | ${p.slice(4)}`,
+        ...trace.map(t=>`Round ${t.round}: E=${t.E.join('')} ⊕ k=${t.subkey.join('')} => sOut=${t.sOut.join('')} newR=${t.newR.join('')}`),
+        `Output: ${cipher}`
+      ];
+      let y=40;
+      for(const L of lines){ addText(24, y, L, 18); y+=32; await new Promise(r=>setTimeout(r,600)); }
+    }catch(e){ console.error(e); alert(e.message); }
+  });
+  // initial draw
+  const demo = DES.runBlock('10101100','01010111'); renderTrace(demo.trace, demo.cipher);
+})();
+
+/* ---------------------------
+  AES (WebCrypto) + toy round visualizer
+---------------------------*/
+(function(){
+  const keyHexInput = document.getElementById('aes-keyhex');
+  const genBtn = document.getElementById('aes-gen');
+  const encBtn = document.getElementById('aes-encrypt');
+  const decBtn = document.getElementById('aes-decrypt');
+  const plainTA = document.getElementById('aes-plain');
+  const cipherKbd = document.getElementById('aes-cipher-kbd');
+  const log = document.getElementById('aes-log');
+  const svg = document.getElementById('aes-svg');
+  const stepBtn = document.getElementById('aes-step');
+  let aesKey = null, lastCipher = null;
+
+  function bytesToHex(b){ return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  function addText(x,y,t,size=16,color='#eafff7'){
+    const el = document.createElementNS('http://www.w3.org/2000/svg','text');
+    el.setAttribute('x',x); el.setAttribute('y',y); el.setAttribute('fill',color);
+    el.setAttribute('font-family','ui-monospace, monospace'); el.setAttribute('font-size',size); el.textContent = t;
+    svg.appendChild(el);
+  }
+  async function genKey(){
+    const k = await crypto.subtle.generateKey({name:'AES-GCM', length:128}, true, ['encrypt','decrypt']);
+    aesKey = k;
+    const raw = new Uint8Array(await crypto.subtle.exportKey('raw',k));
+    keyHexInput.value = bytesToHex(raw);
+    document.getElementById('aes-keyhint').textContent = '128-bit key ready';
+    log.textContent = 'Generated AES-128 key (exported hex).';
+  }
+  genBtn.addEventListener('click', genKey);
+  async function importKeyFromHex(hex){
+    try{
+      const raw = hexToBytes(hex);
+      if(raw.length !== 16) throw new Error('Expect 16 bytes (128-bit key).');
+      aesKey = await crypto.subtle.importKey('raw', raw, 'AES-GCM', true, ['encrypt','decrypt']);
+      document.getElementById('aes-keyhint').textContent = 'Key imported';
+      log.textContent = 'Imported AES key from hex.';
+    }catch(e){ alert(e.message); }
+  }
+  keyHexInput.addEventListener('change', ()=> importKeyFromHex(keyHexInput.value.trim()));
+
+  encBtn.addEventListener('click', async ()=>{
+    try{
+      if(!aesKey) { alert('Generate or import an AES key first.'); return; }
+      const plaintext = utf8ToBytes(plainTA.value);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, aesKey, plaintext);
+      const ctArr = new Uint8Array(ct);
+      lastCipher = {ct:ctArr, iv};
+      cipherKbd.textContent = bytesToHex(ctArr).slice(0,40)+'...';
+      log.textContent = `Encrypted ${plaintext.length} bytes. IV=${bytesToHex(iv)}. Cipher len=${ctArr.length} bytes.`;
+    }catch(e){ log.textContent = 'Encrypt error: '+e.message; console.error(e); }
+  });
+  decBtn.addEventListener('click', async ()=>{
+    try{
+      if(!aesKey || !lastCipher){ alert('Need AES key and a prior cipher.'); return; }
+      const ptBuf = await crypto.subtle.decrypt({name:'AES-GCM', iv:lastCipher.iv}, aesKey, lastCipher.ct);
+      log.textContent = 'Decrypted plaintext: ' + bytesToUtf8(new Uint8Array(ptBuf));
+    }catch(e){ log.textContent = 'Decrypt error: ' + e.message; console.error(e); }
+  });
+
+  function drawAESState(bytes, title='State'){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    const startX = 24, startY = 30, cell = 44, gap = 10;
+    addText(startX, startY, title, 18);
+    for(let r=0;r<4;r++){
+      for(let c=0;c<4;c++){
+        const x = startX + c*(cell+gap);
+        const y = startY + 26 + r*(cell+gap);
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x',x); rect.setAttribute('y',y); rect.setAttribute('width',cell); rect.setAttribute('height',cell);
+        rect.setAttribute('rx',10); rect.setAttribute('fill','rgba(255,255,255,0.09)'); rect.setAttribute('stroke','rgba(255,255,255,0.28)'); rect.setAttribute('stroke-width',2);
+        svg.appendChild(rect);
+        const idx = r + 4*c; const val = bytes[idx] ?? 0;
+        addText(x+10, y+28, (val).toString(16).padStart(2,'0').toUpperCase(), 18);
+      }
+    }
+  }
+  stepBtn.addEventListener('click', async ()=>{
+    try{
+      if(!aesKey){ await genKey(); }
+      const raw = utf8ToBytes(plainTA.value);
+      const block = new Uint8Array(16); block.set(raw.slice(0,16));
+      drawAESState(Array.from(block), 'Initial State (first 16 bytes)');
+      await new Promise(r=>setTimeout(r,700));
+      const sub = Array.from(block).map(b => (b ^ 0x63) & 0xFF); // toy SubBytes
+      drawAESState(sub, 'After SubBytes (toy)');
+      await new Promise(r=>setTimeout(r,700));
+      // ShiftRows (toy)
+      let mat = Array.from({length:4},()=>Array(4).fill(0));
+      for(let c=0;c<4;c++) for(let r=0;r<4;r++) mat[r][c] = sub[r + 4*c];
+      for(let r=0;r<4;r++) mat[r] = mat[r].slice(r).concat(mat[r].slice(0,r));
+      let shifted=[]; for(let c=0;c<4;c++) for(let r=0;r<4;r++) shifted.push(mat[r][c]);
+      drawAESState(shifted, 'After ShiftRows (toy)');
+      await new Promise(r=>setTimeout(r,700));
+      // MixColumns (toy)
+      let mixed=[]; for(let c=0;c<4;c++){ const a=shifted[0+4*c], b=shifted[1+4*c], cc=shifted[2+4*c], d=shifted[3+4*c]; mixed.push(a^b, b^cc, cc^d, d^a); }
+      drawAESState(mixed, 'After MixColumns (toy)');
+      log.textContent = 'Displayed simplified round ideas. Real AES uses S-box and GF(2^8) matrix multiplications.';
+    }catch(e){ console.error(e); alert(e.message); }
+  });
+})();
+
+/* ---------------------------
+  RSA-OAEP (WebCrypto)
+---------------------------*/
+(function(){
+  let rsaKeyPair = null;
+  const genBtn = document.getElementById('rsa-gen');
+  const exportBtn = document.getElementById('rsa-export');
+  const encryptBtn = document.getElementById('rsa-encrypt');
+  const decryptBtn = document.getElementById('rsa-decrypt');
+  const plainInput = document.getElementById('rsa-plain');
+  const status = document.getElementById('rsa-status');
+  const log = document.getElementById('rsa-log');
+  const cipherSpan = document.getElementById('rsa-cipher');
+
+  genBtn.addEventListener('click', async ()=>{
+    try{
+      log.textContent = 'Generating RSA-2048 keypair...';
+      const kp = await crypto.subtle.generateKey({name:'RSA-OAEP', modulusLength:2048, publicExponent:new Uint8Array([1,0,1]), hash:'SHA-256'}, true, ['encrypt','decrypt']);
+      rsaKeyPair = kp; status.textContent = 'public ready'; log.textContent = 'RSA-2048 keypair generated.';
+    }catch(e){ log.textContent = 'RSA gen error: '+e.message; console.error(e);}
+  });
+  exportBtn.addEventListener('click', async ()=>{
+    if(!rsaKeyPair){ alert('Generate key first'); return; }
+    const spki = await crypto.subtle.exportKey('spki', rsaKeyPair.publicKey);
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(spki)));
+    const pem = `-----BEGIN PUBLIC KEY-----\n${b64.match(/.{1,64}/g).join('\n')}\n-----END PUBLIC KEY-----`;
+    const w = window.open('about:blank','Public Key'); w.document.body.style.background='#0b1220'; w.document.body.style.color='#e6eef6';
+    w.document.title = 'RSA Public Key (PEM)'; w.document.body.innerHTML = `<pre style="white-space:pre-wrap;font-size:16px;">${pem}</pre>`;
+  });
+  encryptBtn.addEventListener('click', async ()=>{
+    try{
+      if(!rsaKeyPair){ alert('Generate keypair first'); return; }
+      const pt = utf8ToBytes(plainInput.value);
+      const ct = await crypto.subtle.encrypt({name:'RSA-OAEP'}, rsaKeyPair.publicKey, pt);
+      const ctArr = new Uint8Array(ct);
+      cipherSpan.textContent = btoa(String.fromCharCode(...ctArr)).slice(0,36)+'...';
+      log.textContent = `Encrypted ${pt.length} bytes. Base64 (short): ${btoa(String.fromCharCode(...ctArr)).slice(0,48)}...`;
+      window._lastRSA = ctArr;
+    }catch(e){ console.error(e); log.textContent = 'Encrypt error: '+e.message; }
+  });
+  decryptBtn.addEventListener('click', async ()=>{
+    try{
+      if(!rsaKeyPair || !window._lastRSA) { alert('Need keypair and prior cipher'); return; }
+      const pt = await crypto.subtle.decrypt({name:'RSA-OAEP'}, rsaKeyPair.privateKey, window._lastRSA);
+      log.textContent = 'Decrypted: ' + bytesToUtf8(new Uint8Array(pt));
+    }catch(e){ console.error(e); log.textContent = 'Decrypt error: '+e.message; }
+  });
+})();
+
+/* ---------------------------
+  ECC (ECDH) + AES test
+---------------------------*/
+(function(){
+  let keyA=null, keyB=null;
+  const genBtn = document.getElementById('ecc-gen');
+  const deriveBtn = document.getElementById('ecc-derive');
+  const status = document.getElementById('ecc-status');
+  const log = document.getElementById('ecc-log');
+
+  genBtn.addEventListener('click', async ()=>{
+    log.textContent = 'Generating two ECDH (P-256) keypairs...';
+    keyA = await crypto.subtle.generateKey({name:'ECDH', namedCurve:'P-256'}, true, ['deriveKey','deriveBits']);
+    keyB = await crypto.subtle.generateKey({name:'ECDH', namedCurve:'P-256'}, true, ['deriveKey','deriveBits']);
+    status.textContent = 'keys generated'; log.textContent = 'Generated keyA and keyB.';
+  });
+
+  deriveBtn.addEventListener('click', async ()=>{
+    try{
+      if(!keyA || !keyB) { alert('Generate keys first'); return; }
+      const sharedBitsA = await crypto.subtle.deriveBits({name:'ECDH', public:keyB.publicKey}, keyA.privateKey, 256);
+      const sharedBitsB = await crypto.subtle.deriveBits({name:'ECDH', public:keyA.publicKey}, keyB.privateKey, 256);
+      const sA = new Uint8Array(sharedBitsA), sB = new Uint8Array(sharedBitsB);
+      log.textContent = `Shared bits (hex A): ${bytesToHex(sA).slice(0,48)}...\nShared bits (hex B): ${bytesToHex(sB).slice(0,48)}...`;
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const hkdfA = await crypto.subtle.importKey('raw', sA, 'HKDF', false, ['deriveKey']);
+      const aKey = await crypto.subtle.deriveKey({name:'HKDF', salt, info:new Uint8Array([]), hash:'SHA-256'}, hkdfA, {name:'AES-GCM', length:128}, true, ['encrypt','decrypt']);
+      const hkdfB = await crypto.subtle.importKey('raw', sB, 'HKDF', false, ['deriveKey']);
+      const bKey = await crypto.subtle.deriveKey({name:'HKDF', salt, info:new Uint8Array([]), hash:'SHA-256'}, hkdfB, {name:'AES-GCM', length:128}, true, ['encrypt','decrypt']);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const pt = utf8ToBytes(document.getElementById('ecc-plain').value);
+      const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, aKey, pt);
+      const dec = await crypto.subtle.decrypt({name:'AES-GCM', iv}, bKey, ct);
+      const ok = bytesToUtf8(new Uint8Array(dec)) === bytesToUtf8(pt);
+      log.textContent += `\nHKDF salt(${bytesToHex(salt).slice(0,24)}...) -> AES test decrypt match=${ok}`;
+      status.textContent = ok ? 'OK — shared key matched' : 'Mismatch';
+    }catch(e){ console.error(e); log.textContent = 'Error: '+e.message; status.textContent='error'; }
+  });
+})();
+
+/* ---------------------------
+  Download this page
+---------------------------*/
+(function(){
+  document.getElementById('download-all').addEventListener('click', ()=>{
+    const html = `<!doctype html>\n${document.documentElement.outerHTML}`;
+    const blob = new Blob([html], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='crypto-simulator-tabs.html'; a.click();
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
+</body>
+</html>

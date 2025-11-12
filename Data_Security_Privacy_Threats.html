@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Report: Data & Privacy Security</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .nav-link {
+            transition: background-color 0.2s, color 0.2s, border-bottom-color 0.2s;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #4f46e5;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            border-bottom-color: #d1d5db;
+            color: #374151;
+        }
+
+        .tab-button {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+        .tab-button:not(.active):hover {
+            background-color: #e0e7ff;
+        }
+
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .pet-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .pet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    <!-- Chosen Palette: "Calm Indigo & Slate" -->
+    <!-- Application Structure Plan: A top-navigation SPA structure is chosen, dividing the complex report into four logical, high-level themes: 'Overview', 'The Threat Landscape', 'Defense & Methods', and 'Future Trends'. This provides a clear mental model for the user. The 'Threat' and 'Defense' sections, being the most dense, use a secondary JavaScript-driven tabbed interface. This prevents overwhelming the user with a single long scroll, allows for direct comparison (e.g., of different attack types or defense methods), and makes the information feel more like an explorable application than a static document. -->
+    <!-- Visualization & Content Choices: 
+        - Info: Avg. Cost of Data Breach; Goal: Inform/Impact; Viz: Bar Chart (Cost by Industry) + HTML Card (Avg. Cost); Interaction: Chart hover; Justification: Bar chart provides immediate visual comparison of risk by sector; Library: Chart.js.
+        - Info: Common Attack Vectors; Goal: Compare/Inform; Viz: Donut Chart (% breakdown of causes); Interaction: Dropdown filter (All vs. Malicious vs. Human Error); Justification: A donut chart shows part-to-whole, and the filter allows user-driven exploration of the data; Library: Chart.js, Vanilla JS.
+        - Info: Technical Defense Process; Goal: Inform/Organize; Viz: Interactive HTML/Tailwind flow diagram (Data -> In Transit -> At Rest); Interaction: Click on diagram stages (e.g., "In Transit") to reveal detailed text; Justification: A visual flow is more intuitive than a list. Click-to-reveal keeps the UI clean; Library: HTML/Tailwind, Vanilla JS.
+        - Info: Privacy Enhancing Tech (PETs); Goal: Compare complex concepts; Viz: HTML/Tailwind cards; Interaction: "Complexity" slider. Sliding it changes the descriptive text on all cards from simple to technical; Justification: This interactive element makes dense topics approachable for different audiences; Library: HTML/Tailwind, Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-slate-50 font-inter text-gray-800">
+
+    <div class="min-h-screen">
+        <header class="bg-white shadow-md sticky top-0 z-10">
+            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-2xl font-bold text-indigo-600">Data & Privacy Report</h1>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" class="nav-link active inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="home">Overview</a>
+                        <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="threats">Threat Landscape</a>
+                        <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="methods">Defense & Methods</a>
+                        <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="future">Future Trends</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+
+            <div id="page-home" class="page-content active">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6">Overview: The New Cost of Data</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    Welcome to the interactive report on the state of data and privacy security. In today's digital economy, data is a critical asset, and protecting it is no longer just an IT concern—it's a core business imperative. This application explores the primary risks, the most common attacks, and the state-of-the-art methods being used to protect data and ensure user privacy.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-lg flex flex-col justify-center items-center text-center">
+                        <span class="text-5xl font-bold text-indigo-600">$4.45 Million</span>
+                        <span class="text-xl font-semibold text-gray-700 mt-2">Global Average Cost</span>
+                        <p class="text-gray-500 mt-1">of a Data Breach in 2023</p>
+                    </div>
+                    <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold text-center mb-4">Cost of a Breach by Industry (USD Millions)</h3>
+                        <p class="text-center text-gray-600 mb-4 text-sm">Hover over the bars to see the average cost. This visualization highlights how data-sensitive industries like healthcare and finance face significantly higher financial risks from breaches.</p>
+                        <div class="chart-container">
+                            <canvas id="costByIndustryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-threats" class="page-content">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6">The Threat Landscape</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    Understanding the problem is the first step to solving it. The "Threat Landscape" is a dynamic and evolving environment. This section breaks down the primary risks, their impacts, and the common attack vectors used by malicious actors. Use the tabs below to explore each area.
+                </p>
+
+                <div id="threats-tabs">
+                    <div class="flex border-b border-gray-300 mb-6">
+                        <button class="tab-button active font-semibold py-3 px-6 rounded-t-lg -mb-px" data-tab="risks">Risks & Impact</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="attacks">Common Attacks</button>
+                    </div>
+
+                    <div class="tab-content active bg-white p-6 rounded-lg shadow-md" data-tab-content="risks">
+                        <h3 class="text-2xl font-semibold mb-3">The Real Cost of Data Loss & Breaches</h3>
+                        <p class="text-gray-700 mb-4">A data breach or loss event has cascading consequences far beyond the immediate technical cleanup. The impact is multifaceted:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                                <h4 class="text-lg font-semibold text-red-800">Financial Loss</h4>
+                                <ul class="list-disc list-outside ml-5 text-gray-700 text-sm">
+                                    <li>Regulatory fines (e.g., GDPR, CCPA)</li>
+                                    <li>Incident response & recovery costs</li>
+                                    <li>Customer notification & credit monitoring</li>
+                                    <li>Potential lawsuits</li>
+                                </ul>
+                            </div>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                                <h4 class="text-lg font-semibold text-yellow-800">Reputational Damage</h4>
+                                <ul class="list-disc list-outside ml-5 text-gray-700 text-sm">
+                                    <li>Loss of customer trust</li>
+                                    <li>Negative press & social media</li>
+                                    <li>Damage to brand value</li>
+                                    <li>Loss of partners & investors</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                <h4 class="text-lg font-semibold text-blue-800">Operational Disruption</h4>
+                                <ul class="list-disc list-outside ml-5 text-gray-700 text-sm">
+                                    <li>System downtime</li>
+                                    <li>Loss of intellectual property</li>
+                                    <li>Diversion of resources to crisis mode</li>
+                                    <li>Employee morale impact</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="attacks">
+                        <h3 class="text-2xl font-semibold mb-3">Interactive: Initial Attack Vectors</h3>
+                        <p class="text-gray-700 mb-4">This chart shows the most common root causes of data breaches. Use the filter to see how the landscape changes based on whether the breach was caused by a malicious outsider, an internal error, or a compromised insider.</p>
+                        
+                        <div class="flex items-center justify-center mb-4">
+                            <label for="attack-filter" class="mr-2 font-medium">Filter by Cause:</label>
+                            <select id="attack-filter" class="p-2 border border-gray-300 rounded-md shadow-sm">
+                                <option value="all">All Breaches</option>
+                                <option value="malicious">Malicious Attacks</option>
+                                <option value="human_error">Human Error</option>
+                            </select>
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="attackVectorChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-methods" class="page-content">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6">Defense & Methods</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    A robust defense strategy is layered, combining state-of-the-art technology with modern security frameworks and strong policies. This section explores the technical methods used to protect data, the emerging field of Privacy Enhancing Technologies (PETs), and the architectural frameworks that tie everything together.
+                </p>
+
+                <div id="methods-tabs">
+                    <div class="flex border-b border-gray-300 mb-6">
+                        <button class="tab-button active font-semibold py-3 px-6 rounded-t-lg -mb-px" data-tab="tech">Technical Defenses</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="pets">Privacy Enhancing Tech</button>
+                        <button class="tab-button font-semibold py-3 px-6" data-tab="frameworks">Frameworks & Policy</button>
+                    </div>
+
+                    <div class="tab-content active bg-white p-6 rounded-lg shadow-md" data-tab-content="tech">
+                        <h3 class="text-2xl font-semibold mb-4">Interactive: The Data Protection Lifecycle</h3>
+                        <p class="text-gray-700 mb-6">Data must be protected at all stages of its life. Click on a stage in the diagram below to learn about the key technologies used to secure data in that state.</p>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-6">
+                            <div class="text-center">
+                                <span class="text-lg font-medium">Data (Source)</span>
+                            </div>
+                            <div class="text-gray-400 text-2xl font-mono hidden md:block">--&gt;</div>
+                            <div class="text-gray-400 text-2xl font-mono md:hidden">↓</div>
+                            <button class="tech-button bg-blue-100 text-blue-800 py-3 px-5 rounded-lg shadow-sm hover:bg-blue-200 transition" data-tech="transit">
+                                <strong>In Transit</strong> (e.g., over WiFi/Internet)
+                            </button>
+                            <div class="text-gray-400 text-2xl font-mono hidden md:block">--&gt;</div>
+                            <div class="text-gray-400 text-2xl font-mono md:hidden">↓</div>
+                            <button class="tech-button bg-green-100 text-green-800 py-3 px-5 rounded-lg shadow-sm hover:bg-green-200 transition" data-tech="rest">
+                                <strong>At Rest</strong> (e.g., in a database)
+                            </button>
+                        </div>
+                        
+                        <div id="tech-details" class="bg-gray-50 p-6 rounded-lg border border-gray-200 min-h-[100px]">
+                            <p class="text-gray-600 italic text-center">Click a stage above to see details.</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="pets">
+                        <h3 class="text-2xl font-semibold mb-2">Privacy Enhancing Technologies (PETs)</h3>
+                        <p class="text-gray-700 mb-4">PETs are a class of technologies that protect personal data by minimizing data use, maximizing security, and empowering individuals. They allow for data analysis without compromising privacy.</p>
+                        
+                        <div class="mb-6">
+                            <label for="complexity-slider" class="block font-medium text-gray-700">Adjust Explanation Complexity:</label>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-500">Simple</span>
+                                <input type="range" id="complexity-slider" min="0" max="1" step="1" class="w-full">
+                                <span class="text-sm text-gray-500">Technical</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="pet-card bg-slate-100 p-6 rounded-lg shadow">
+                                <h4 class="text-lg font-semibold text-indigo-700">Differential Privacy</h4>
+                                <p class="pet-desc text-gray-700 text-sm mt-2" data-tech="dp">...</p>
+                            </div>
+                            <div class="pet-card bg-slate-100 p-6 rounded-lg shadow">
+                                <h4 class="text-lg font-semibold text-indigo-700">Homomorphic Encryption</h4>
+                                <p class="pet-desc text-gray-700 text-sm mt-2" data-tech="he">...</p>
+                            </div>
+                            <div class="pet-card bg-slate-100 p-6 rounded-lg shadow">
+                                <h4 class="text-lg font-semibold text-indigo-700">Federated Learning</h4>
+                                <p class="pet-desc text-gray-700 text-sm mt-2" data-tech="fl">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content bg-white p-6 rounded-lg shadow-md" data-tab-content="frameworks">
+                        <h3 class="text-2xl font-semibold mb-4">Modern Framework: Zero Trust Architecture</h3>
+                        <p class="text-gray-700 mb-6">"Zero Trust" is a security model that shifts the paradigm from "trust but verify" to "never trust, always verify." It assumes that threats exist both inside and outside the network, so no user or device is trusted by default.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-indigo-50 p-6 rounded-lg border-t-4 border-indigo-500">
+                                <h4 class="text-xl font-semibold text-indigo-800 mb-2">1. Verify Explicitly</h4>
+                                <p class="text-gray-700">Always authenticate and authorize based on all available data points, including user identity, location, device health, and service.</p>
+                            </div>
+                            <div class="bg-indigo-50 p-6 rounded-lg border-t-4 border-indigo-500">
+                                <h4 class="text-xl font-semibold text-indigo-800 mb-2">2. Use Least Privilege</h4>
+                                <p class="text-gray-700">Limit user access with Just-In-Time and Just-Enough-Access (JIT/JEA) policies to only the resources they absolutely need, when they need them.</p>
+                            </div>
+                            <div class="bg-indigo-50 p-6 rounded-lg border-t-4 border-indigo-500">
+                                <h4 class="text-xl font-semibold text-indigo-800 mb-2">3. Assume Breach</h4>
+                                <p class="text-gray-700">Minimize the blast radius. Segment networks, encrypt all communications, and use analytics to detect threats and improve defenses.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-future" class="page-content">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6">Future Trends: The Next Frontier</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    The fields of data security and privacy are in a constant state of evolution, driven by new technologies that present both unprecedented challenges and powerful new defenses. This section looks at the most significant trends shaping the future.
+                </p>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3 text-teal-700">The AI Duality: Attacker and Defender</h3>
+                        <p class="text-gray-700">AI is a double-edged sword. Attackers are using AI to create highly sophisticated, personalized phishing attacks and to automate vulnerability discovery. On the flip side, defenders are using AI (specifically machine learning) to detect anomalies in network traffic, identify insider threats, and respond to incidents at machine speed, far faster than any human team could.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3 text-purple-700">The Quantum Threat</h3>
+                        <p class="text-gray-700">Quantum computing poses an existential threat to our current cryptographic standards. A sufficiently powerful quantum computer could theoretically break most of the encryption we rely on today (like RSA and ECC) in a very short time. This has triggered a race to develop and standardize "post-quantum cryptography" (PQC)—new encryption algorithms that are secure against both classical and quantum computers.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-semibold mb-3 text-indigo-700">Decentralized Identity & Self-Sovereign ID (SSI)</h3>
+                        <p class="text-gray-700">This trend aims to give users back control of their digital identities. Instead of relying on third-party providers (like Google or Facebook) to manage identity, SSI models use technologies like blockchain to allow users to store their own identity credentials in a personal digital wallet. They can then present verifiable proof of their identity without handing over their personal data.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page-content');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page');
+                    
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    pages.forEach(page => {
+                        page.classList.toggle('active', page.id === 'page-' + pageId);
+                    });
+                });
+            });
+
+            function setupTabs(containerSelector) {
+                const container = document.querySelector(containerSelector);
+                if (!container) return;
+
+                const tabButtons = container.querySelectorAll('.tab-button');
+                const tabContents = container.querySelectorAll('.tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabId = button.getAttribute('data-tab');
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        tabContents.forEach(content => {
+                            content.classList.toggle('active', content.getAttribute('data-tab-content') === tabId);
+                        });
+                    });
+                });
+            }
+
+            setupTabs('#threats-tabs');
+            setupTabs('#methods-tabs');
+
+            const ctxIndustryCost = document.getElementById('costByIndustryChart');
+            if (ctxIndustryCost) {
+                new Chart(ctxIndustryCost.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Healthcare', 'Financial', 'Pharma', 'Technology', 'Energy', 'Retail', 'Education'],
+                        datasets: [{
+                            label: 'Avg. Cost of Breach (Millions)',
+                            data: [10.93, 5.90, 5.04, 5.01, 4.78, 3.12, 2.98],
+                            backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Cost in Millions (USD)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            const attackData = {
+                all: {
+                    labels: ['Phishing', 'Human Error', 'Ransomware', 'Insider Threat', 'Supply Chain'],
+                    data: [30, 22, 18, 15, 15]
+                },
+                malicious: {
+                    labels: ['Ransomware', 'Phishing', 'Insider (Malicious)', 'Supply Chain'],
+                    data: [40, 35, 15, 10]
+                },
+                human_error: {
+                    labels: ['Misconfiguration', 'Lost Device', 'Sent to Wrong Person', 'Credentials Error'],
+                    data: [45, 25, 20, 10]
+                }
+            };
+            let attackChart;
+            const ctxAttack = document.getElementById('attackVectorChart');
+            if (ctxAttack) {
+                attackChart = new Chart(ctxAttack.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: attackData.all.labels,
+                        datasets: [{
+                            label: 'Breach Cause',
+                            data: attackData.all.data,
+                            backgroundColor: ['#4f46e5', '#f59e0b', '#ef4444', '#10b981', '#6b7280']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            const attackFilter = document.getElementById('attack-filter');
+            if (attackFilter && attackChart) {
+                attackFilter.addEventListener('change', (e) => {
+                    const filter = e.target.value;
+                    attackChart.data.labels = attackData[filter].labels;
+                    attackChart.data.datasets[0].data = attackData[filter].data;
+                    attackChart.update();
+                });
+            }
+
+            const techButtons = document.querySelectorAll('.tech-button');
+            const techDetails = document.getElementById('tech-details');
+            const techInfo = {
+                transit: {
+                    title: 'Encryption in Transit (TLS/SSL)',
+                    text: "This protects data as it moves between your device and a server. It uses <strong>Transport Layer Security (TLS)</strong> to create an encrypted tunnel, preventing attackers from 'eavesdropping' on the connection. You see this as the 'https' and padlock icon in your browser."
+                },
+                rest: {
+                    title: 'Encryption at Rest (TDE, AES)',
+                    text: "This protects data while it is stored on a disk (e.g., in a database, on a laptop). It uses strong algorithms like <strong>AES-256</strong> to scramble the data, making it unreadable to anyone who steals the physical drive without the decryption key. Technologies like <strong>Transparent Data Encryption (TDE)</strong> automate this for databases."
+                }
+            };
+
+            techButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const techId = button.getAttribute('data-tech');
+                    techDetails.innerHTML = `
+                        <h5 class="text-lg font-semibold text-gray-900 mb-2">${techInfo[techId].title}</h5>
+                        <p class="text-gray-700">${techInfo[techId].text}</p>
+                    `;
+                });
+            });
+
+            const petDescriptions = {
+                dp: {
+                    simple: "Adds 'statistical noise' (randomness) to data analysis. This allows companies to see broad trends (e.g., '70% of users like this feature') without being able to identify any single person's data.",
+                    technical: "Provides a formal privacy guarantee by ensuring that the results of a query are statistically similar whether or not any single individual's data is included, mitigating membership inference attacks."
+                },
+                he: {
+                    simple: "A special type of encryption that allows a computer to perform calculations on data *while it is still encrypted*. This means a service (e.g., a cloud provider) can analyze your data without ever 'seeing' the raw, unencrypted information.",
+                    technical: "Enables computation on ciphertexts, generating an encrypted result which, when decrypted, matches the result of the operations as if they had been performed on the plaintext. This allows for 'blind' data processing."
+                },
+                fl: {
+                    simple: "Instead of sending all your personal data (e.g., your typing habits) to a central server to train an AI, this method sends the AI model *to your device*. The AI learns on your device, and only the 'lessons' (model updates), not your data, are sent back.",
+                    technical: "A decentralized machine learning approach that trains an algorithm across multiple devices holding local data samples, without exchanging the data itself, thus minimizing data collection and aggregation."
+                }
+            };
+
+            const slider = document.getElementById('complexity-slider');
+            const petDescs = document.querySelectorAll('.pet-desc');
+
+            function updatePetText() {
+                const level = slider.value; // 0 for simple, 1 for technical
+                petDescs.forEach(desc => {
+                    const tech = desc.getAttribute('data-tech');
+                    desc.textContent = (level == 0) ? petDescriptions[tech].simple : petDescriptions[tech].technical;
+                });
+            }
+
+            if (slider) {
+                slider.addEventListener('input', updatePetText);
+                updatePetText();
+            }
+
+        });
+    </script>
+</body>
+</html>

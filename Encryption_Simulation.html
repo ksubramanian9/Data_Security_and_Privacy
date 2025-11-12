@@ -162,6 +162,8 @@
       <button id="rsa-decrypt" class="ghost">Decrypt</button>
       <div style="margin-left:auto" class="muted">Cipher (Base64): <span id="rsa-cipher" class="kbd">—</span></div>
     </div>
+    <label style="margin-top:12px">Ciphertext to decrypt (Base64, optional)</label>
+    <input id="rsa-cipher-input" type="text" placeholder="Paste a Base64-encoded ciphertext here to decrypt it" />
     <pre id="rsa-log" style="margin-top:12px; min-height:120px;"></pre>
   </section>
 
@@ -303,7 +305,7 @@ const DES = (function(){
   }
   function renderTrace(trace, cipher){
     while(svg.firstChild) svg.removeChild(svg.firstChild);
-    const startX=24, startY=40, boxW=300, boxH=90, gap=260;
+    const startX=24, startY=40, boxW=300, boxH=90, gap=330;
     addText(startX, 24, 'Input L(4) | R(4)', 17);
     addText(startX, 48, trace[0].L.join('') + ' | ' + trace[0].R.join(''), 20);
     trace.forEach((t,i)=>{
@@ -313,9 +315,9 @@ const DES = (function(){
       rect.setAttribute('rx',12); rect.setAttribute('fill','rgba(255,255,255,0.08)'); rect.setAttribute('stroke','rgba(255,255,255,0.25)');
       svg.appendChild(rect);
       addText(x+12, y+26, `Round ${t.round}`, 18);
-      addText(x+12, y+48, `L=${t.L.join('')}  R=${t.R.join('')}`, 16);
-      addText(x+12, y+70, `E=${t.E.join('')}  k=${t.subkey.join('')}`, 16);
-      addText(x+154, y+48, `sOut=${t.sOut.join('')}  newR=${t.newR.join('')}`, 16);
+      addText(x+12, y+48, `L=${t.L.join('')}  R=${t.R.join('')}`, 15);
+      addText(x+12, y+70, `E=${t.E.join('')}  k=${t.subkey.join('')}`, 15);
+      addText(x+12, y+85, `sOut=${t.sOut.join('')}  newR=${t.newR.join('')}`, 14);
       const line = document.createElementNS('http://www.w3.org/2000/svg','line');
       line.setAttribute('x1', x-12); line.setAttribute('y1', y+boxH/2); line.setAttribute('x2', x); line.setAttribute('y2', y+boxH/2);
       line.setAttribute('stroke','rgba(255,255,255,0.35)'); line.setAttribute('stroke-width',3); svg.appendChild(line);
@@ -471,6 +473,7 @@ const DES = (function(){
   const encryptBtn = document.getElementById('rsa-encrypt');
   const decryptBtn = document.getElementById('rsa-decrypt');
   const plainInput = document.getElementById('rsa-plain');
+  const cipherInput = document.getElementById('rsa-cipher-input');
   const status = document.getElementById('rsa-status');
   const log = document.getElementById('rsa-log');
   const cipherSpan = document.getElementById('rsa-cipher');
@@ -494,6 +497,13 @@ const DES = (function(){
     try{
       if(!rsaKeyPair){ alert('Generate keypair first'); return; }
       const pt = utf8ToBytes(plainInput.value);
+      // RSA-OAEP with 2048-bit key and SHA-256 can encrypt up to ~190 bytes
+      const maxLen = 190;
+      if(pt.length > maxLen){
+        log.textContent = `Error: Input too long for RSA encryption.\nRSA-2048 with OAEP (SHA-256) can only encrypt up to ${maxLen} bytes.\nPaste a shorter message or use hybrid encryption.`;
+        cipherSpan.textContent = '—';
+        return;
+      }
       const ct = await crypto.subtle.encrypt({name:'RSA-OAEP'}, rsaKeyPair.publicKey, pt);
       const ctArr = new Uint8Array(ct);
       cipherSpan.textContent = btoa(String.fromCharCode(...ctArr)).slice(0,36)+'...';
@@ -503,8 +513,30 @@ const DES = (function(){
   });
   decryptBtn.addEventListener('click', async ()=>{
     try{
-      if(!rsaKeyPair || !window._lastRSA) { alert('Need keypair and prior cipher'); return; }
-      const pt = await crypto.subtle.decrypt({name:'RSA-OAEP'}, rsaKeyPair.privateKey, window._lastRSA);
+      if(!rsaKeyPair){ alert('Generate keypair first'); return; }
+      let cipherBytes = null;
+      
+      // Try to use pasted ciphertext first (Base64), then fall back to last encrypted
+      if(cipherInput.value.trim()){
+        try{
+          const b64 = cipherInput.value.trim();
+          const binaryString = atob(b64);
+          cipherBytes = new Uint8Array(binaryString.length);
+          for(let i=0; i<binaryString.length; i++){
+            cipherBytes[i] = binaryString.charCodeAt(i);
+          }
+        }catch(e){
+          log.textContent = 'Error decoding Base64 ciphertext: ' + e.message;
+          return;
+        }
+      } else if(window._lastRSA){
+        cipherBytes = window._lastRSA;
+      } else {
+        alert('Need keypair and either a prior cipher or pasted Base64 ciphertext'); 
+        return; 
+      }
+      
+      const pt = await crypto.subtle.decrypt({name:'RSA-OAEP'}, rsaKeyPair.privateKey, cipherBytes);
       log.textContent = 'Decrypted: ' + bytesToUtf8(new Uint8Array(pt));
     }catch(e){ console.error(e); log.textContent = 'Decrypt error: '+e.message; }
   });

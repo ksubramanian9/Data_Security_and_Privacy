@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Security & Privacy: 2035 Outlook</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #0f172a; }
+    .tab-btn.active {
+      background: linear-gradient(90deg, #dbeafe, #e0f2fe);
+      color: #1e40af;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+    }
+    .content-section { display: none; }
+    .content-section.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .section-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <nav class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+      <h1 class="text-3xl font-extrabold text-blue-900">🔐 Data Security & Privacy: 2035 Outlook</h1>
+      <div class="flex flex-wrap gap-2 text-sm">
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="overview">Overview</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="tech">Technology</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="threats">Threats</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="regulation">Regulations</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="users">Users & Trust</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="design">Design</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="convergence">Convergence</button>
+        <button class="tab-btn px-3 py-2 rounded-md" data-target="impact">Impacts</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container mx-auto px-4 py-10 space-y-12">
+    <section id="overview" class="content-section active section-card">
+      <h2 class="text-2xl font-bold mb-4 text-blue-800">Executive Summary</h2>
+      <p class="text-lg">The decade ahead will challenge and transform data protection as we know it. AI-driven automation, the quantum computing threat, global regulatory harmonization, and increasing expectations for ethical data stewardship define the landscape. This navigable brief distills key insights to help guide strategy and innovation in an interconnected, privacy-aware world.</p>
+    </section>
+
+    <section id="tech" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-blue-800">Technological Advances</h2>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li><strong>AI for Defense and Offense:</strong> Real-time threat detection, AI-powered malware, and intelligent phishing.</li>
+        <li><strong>Quantum-Resistant Cryptography:</strong> Preparing systems for cryptographic agility by 2030.</li>
+        <li><strong>Zero Trust Models:</strong> Enforcing least-privilege access and authentication by default.</li>
+        <li><strong>Privacy-Enhancing Technologies:</strong> Homomorphic encryption, secure computation, and differential privacy becoming enterprise-ready.</li>
+      </ul>
+    </section>
+
+    <section id="threats" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-red-700">Evolving Threat Landscape</h2>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li><strong>AI-Powered Attacks:</strong> Deepfakes, polymorphic malware, and voice phishing.</li>
+        <li><strong>Software Supply Chain:</strong> Exploits through third-party components and CI/CD pipelines.</li>
+        <li><strong>Ransomware-as-a-Service:</strong> Accessible to low-skilled attackers; evolving into an industry.</li>
+        <li><strong>IoT & OT Risks:</strong> Massive attack surfaces with weak protection in critical infrastructure.</li>
+      </ul>
+    </section>
+
+    <section id="regulation" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-blue-800">Global Regulatory Momentum</h2>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li>172+ countries now enforce data privacy laws.</li>
+        <li>Cross-border compliance: EU–US Data Privacy Framework, APEC CBPR, and localization laws.</li>
+        <li>Broader enforcement: algorithmic transparency, consent, data portability, and breach notification mandates.</li>
+      </ul>
+    </section>
+
+    <section id="users" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-blue-800">User Expectations & Corporate Trust</h2>
+      <p class="mb-3 text-gray-700">Privacy is now a brand pillar. Responsible data handling is a market differentiator, with measurable ROI:</p>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li>Users demand agency: clear consent, data access, deletion, and visibility.</li>
+        <li>Privacy drives loyalty: 70% of users will abandon brands after mishandling data.</li>
+        <li>Governance shift: CPOs, privacy engineering, and ethics boards embedded in product teams.</li>
+      </ul>
+    </section>
+
+    <section id="design" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-blue-800">Privacy by Design</h2>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li>Minimization and contextual controls from the first line of code.</li>
+        <li>Tools: federated learning, differential privacy, secure enclaves.</li>
+        <li>UX-led privacy: dashboards, data nutrition labels, and frictionless revocation.</li>
+      </ul>
+    </section>
+
+    <section id="convergence" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-blue-800">Converging Security & Privacy</h2>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li>Integrated PETs, threat mitigation, and compliance by default.</li>
+        <li>Joint frameworks: NIST, ISO/IEC 27701, and unified audit paths.</li>
+        <li>Cloud-native solutions blending security posture and privacy guardrails.</li>
+      </ul>
+    </section>
+
+    <section id="impact" class="content-section section-card">
+      <h2 class="text-2xl font-bold mb-3 text-blue-800">Implications Across Stakeholders</h2>
+      <ul class="list-disc pl-5 space-y-2 text-gray-700">
+        <li><strong>Individuals:</strong> Greater rights and risks; digital self-defense is essential.</li>
+        <li><strong>Enterprises:</strong> Trust as currency; security and privacy as shared responsibility.</li>
+        <li><strong>Governments:</strong> Policy innovation, cyber diplomacy, and citizen protection mandates.</li>
+        <li><strong>Society:</strong> Ethical tech and resilient infrastructures form the trust backbone of digital life.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(btn.dataset.target);
+        if (target) target.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

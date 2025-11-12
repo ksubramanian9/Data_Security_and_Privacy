@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
   :root {
-    --bg:#0f1724; --card:#0b1220; --muted:#b8c3cc; --accent:#6ee7b7; --glass: rgba(255,255,255,0.05);
+    --bg:#f8fafc; --card:#ffffff; --muted:#6b7280; --accent:#2563eb; --accent-deep:#1e40af; --glass: rgba(15,23,42,0.06);
     --panel-pad:18px;
     --radius:16px;
     --font-base:18.5px;
@@ -16,48 +16,48 @@
     --svg-h:340px;
     --layout-w:1400px;
   }
-  html,body { height:100%; margin:0; background:linear-gradient(180deg,#071021 0%, #091432 100%); color:#eef5fb; font-family: Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto; font-size: var(--font-base);}
-  header { padding:28px 22px; display:flex; gap:18px; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.06); max-width:var(--layout-w); margin:0 auto;}
-  header h1 { margin:0; font-size: 28px; letter-spacing:0.2px; }
+  html,body { height:100%; margin:0; background:linear-gradient(180deg,#fbfdff 0%, var(--bg) 100%); color:#0f172a; font-family: Inter, ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto; font-size: var(--font-base);}
+  header { padding:28px 22px; display:flex; gap:18px; align-items:flex-start; border-bottom:1px solid rgba(15,23,42,0.06); max-width:var(--layout-w); margin:0 auto; background:#ffffff; box-shadow: 0 1px 3px rgba(15,23,42,0.06); }
+  header h1 { margin:0; font-size: 28px; letter-spacing:0.2px; color:var(--accent-deep); }
   header p { margin:4px 0 0 0; color:var(--muted); font-size: 16px; }
   .container { padding:20px; max-width: var(--layout-w); margin:0 auto; }
-  .card { background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-          border-radius: var(--radius); padding: var(--panel-pad); box-shadow: 0 10px 26px rgba(2,6,23,0.55); border:1px solid rgba(255,255,255,0.08); }
+  .card { background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92));
+          border-radius: var(--radius); padding: var(--panel-pad); box-shadow: 0 10px 30px rgba(2,6,23,0.06); border:1px solid rgba(15,23,42,0.03); }
   .row { display:flex; gap:12px; align-items:center; margin-top:10px; flex-wrap:wrap; }
   label { display:block; font-size: 16px; color:var(--muted); margin-bottom:8px; }
   textarea, input[type="text"], select {
-    width:100%; padding:14px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12);
-    background:var(--glass); color:#eef5fb; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", monospace;
+    width:100%; padding:14px 12px; border-radius:12px; border:1px solid rgba(15,23,42,0.12);
+    background:#ffffff; color:#0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", monospace;
     font-size: var(--font-code); box-sizing:border-box;
   }
-  button { background:linear-gradient(90deg,var(--accent),#3dd5c1); color:#062; border:0; padding:12px 14px; border-radius:12px; font-weight:700; cursor:pointer; font-size: 16px; }
-  button.ghost { background:transparent; border:1px solid rgba(255,255,255,0.18); color:#e1eef5;}
+  button { background:linear-gradient(90deg,var(--accent),#3b82f6); color:#ffffff; border:0; padding:12px 14px; border-radius:12px; font-weight:700; cursor:pointer; font-size: 16px; }
+  button.ghost { background:transparent; border:1px solid rgba(15,23,42,0.18); color:#334155;}
   button.small { padding:9px 12px; font-size: 15px;}
-  pre { background: rgba(0,0,0,0.22); padding:14px; border-radius:12px; font-size: var(--font-code); overflow:auto; color:#e6eef6; }
-  .svg-area { width:100%; height: var(--svg-h); display:block; background:linear-gradient(90deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04)); border-radius:12px; padding:10px; box-sizing:border-box; }
+  pre { background: rgba(15,23,42,0.06); padding:14px; border-radius:12px; font-size: var(--font-code); overflow:auto; color:#0f172a; }
+  .svg-area { width:100%; height: var(--svg-h); display:block; background:linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.02)); border-radius:12px; padding:10px; box-sizing:border-box; }
   .muted { color:var(--muted); }
-  .kbd { background:#0a2138; border-radius:10px; padding:6px 10px; font-family: ui-monospace, monospace; font-size: var(--font-code); color:#d6f5ee; border:1px solid rgba(255,255,255,0.12); }
-  footer { padding:18px; color:var(--muted); font-size: 15px; text-align:center; }
+  .kbd { background:#f3f4f6; border-radius:10px; padding:6px 10px; font-family: ui-monospace, monospace; font-size: var(--font-code); color:#1e40af; border:1px solid rgba(15,23,42,0.12); }
+  footer { padding:18px; color:var(--muted); font-size: 15px; text-align:center; border-top:1px solid rgba(15,23,42,0.04); }
 
   /* Tabs */
   .tabs { margin-top:18px; }
   .tablist {
     display:flex; gap:10px; flex-wrap:wrap;
-    background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10);
+    background: rgba(15,23,42,0.04); border:1px solid rgba(15,23,42,0.08);
     padding:10px; border-radius: 999px;
   }
   .tab {
     appearance:none; border:0; cursor:pointer; border-radius:999px; padding:10px 16px; font-weight:700; font-size:18px;
-    color:#cfe9e2; background:transparent; border:1px solid transparent;
+    color:#6b7280; background:transparent; border:1px solid transparent;
   }
-  .tab[aria-selected="true"] { background:linear-gradient(90deg,var(--accent),#56e7d7); color:#042; }
+  .tab[aria-selected="true"] { background:linear-gradient(90deg,#3b82f6,#1d4ed8); color:#ffffff; }
   .tabpanel { margin-top:16px; }
   .hidden { display:none !important; }
 
   /* Larger headings in panels */
   h3 { font-size: 22px; margin:0 0 6px 0; }
   details summary { cursor:pointer; font-size: 16px; }
-  .pill { background:rgba(255,255,255,0.09); padding:8px 12px; border-radius:999px; font-size: 15px; color:#d9e6f0; border:1px solid rgba(255,255,255,0.12); }
+  .pill { background:rgba(15,23,42,0.06); padding:8px 12px; border-radius:999px; font-size: 15px; color:#334155; border:1px solid rgba(15,23,42,0.10); }
 
   /* Responsive */
   @media (max-width: 1100px){
@@ -97,6 +97,20 @@
   <section id="panel-des" class="tabpanel card" role="tabpanel" aria-labelledby="tab-des">
     <h3>Toy DES — Feistel round visualizer (educational)</h3>
     <p class="muted">Tiny 8-bit block, 2-round Feistel cipher to demonstrate expansion, XOR with subkeys, S-box, and swap. <strong>Not secure</strong> — for teaching only.</p>
+    
+    <div style="background:rgba(15,23,42,0.03); border-left:4px solid #2563eb; padding:12px; border-radius:6px; margin:12px 0;">
+      <p style="margin:0 0 8px 0; font-weight:600; color:#1e40af;">How the simulation works:</p>
+      <ol style="margin:0; padding-left:20px; color:#334155;">
+        <li><strong>Split:</strong> Divide the 8-bit input into left (L) and right (R) halves (4 bits each).</li>
+        <li><strong>Expand:</strong> Expand R from 4 bits to 6 bits using a toy expansion function.</li>
+        <li><strong>XOR with key:</strong> XOR the expanded R with a subkey derived from your key.</li>
+        <li><strong>S-box:</strong> Apply two tiny substitution boxes to compress the result back to 4 bits.</li>
+        <li><strong>XOR with L:</strong> XOR the S-box output with L to create a new R.</li>
+        <li><strong>Swap:</strong> The old R becomes the new L; the new R becomes the output for this round.</li>
+        <li><strong>Repeat:</strong> Run this 2 more times (2 rounds total), then output the final L|R as the ciphertext.</li>
+      </ol>
+    </div>
+    
     <div class="row" style="margin-top:6px;">
       <label style="flex:1">
         Plain (8-bit binary)
@@ -127,6 +141,18 @@
   <section id="panel-aes" class="tabpanel card hidden" role="tabpanel" aria-labelledby="tab-aes" tabindex="0">
     <h3>AES (WebCrypto AES-GCM) + Round Visualizer</h3>
     <p class="muted">Uses SubtleCrypto for real AES-GCM. Visualizer shows simplified block-round ideas (toy SubBytes/ShiftRows/MixColumns) for teaching.</p>
+    
+    <div style="background:rgba(15,23,42,0.03); border-left:4px solid #2563eb; padding:12px; border-radius:6px; margin:12px 0;">
+      <p style="margin:0 0 8px 0; font-weight:600; color:#1e40af;">How the simulation works:</p>
+      <ol style="margin:0; padding-left:20px; color:#334155;">
+        <li><strong>Generate or import key:</strong> Click "Generate Key" to create a random 128-bit AES key (or paste your own 32 hex chars).</li>
+        <li><strong>Enter plaintext:</strong> Type the message you want to encrypt in the plaintext box.</li>
+        <li><strong>Encrypt (AES-GCM):</strong> Click "Encrypt" to apply AES-256-GCM (real cryptography via WebCrypto). The simulator generates a random IV and produces a Base64-encoded ciphertext.</li>
+        <li><strong>Decrypt:</strong> Click "Decrypt" to reverse the process using the same key and IV, recovering your original plaintext.</li>
+        <li><strong>Show round steps:</strong> Click "Show round steps" to visualize a simplified version of SubBytes, ShiftRows, and MixColumns operations (toy versions for teaching).</li>
+      </ol>
+    </div>
+    
     <label>Plaintext (UTF-8)</label>
     <textarea id="aes-plain" rows="4">Hello AES demo!</textarea>
     <div class="row">
@@ -152,6 +178,19 @@
   <section id="panel-rsa" class="tabpanel card hidden" role="tabpanel" aria-labelledby="tab-rsa" tabindex="0">
     <h3>RSA-OAEP (WebCrypto)</h3>
     <p class="muted">Generate RSA-2048 key pair, encrypt with public key, decrypt with private key.</p>
+    
+    <div style="background:rgba(15,23,42,0.03); border-left:4px solid #2563eb; padding:12px; border-radius:6px; margin:12px 0;">
+      <p style="margin:0 0 8px 0; font-weight:600; color:#1e40af;">How the simulation works:</p>
+      <ol style="margin:0; padding-left:20px; color:#334155;">
+        <li><strong>Generate keypair:</strong> Click "Generate RSA-2048 Keypair" to create a public and private key pair.</li>
+        <li><strong>Export public key (optional):</strong> Click "Export public (PEM)" to see the public key in PEM format (you could share this with others).</li>
+        <li><strong>Enter plaintext:</strong> Type a short message (max ~190 characters) in the "Plaintext" box.</li>
+        <li><strong>Encrypt:</strong> Click "Encrypt" to encrypt your message with the public key. The simulator shows the ciphertext in Base64.</li>
+        <li><strong>Decrypt:</strong> Click "Decrypt" to decrypt using the private key, recovering your original plaintext.</li>
+        <li><strong>Paste external ciphertext (optional):</strong> Paste a Base64-encoded ciphertext into the "Ciphertext to decrypt" box and click "Decrypt" to decrypt it (useful for testing with external data).</li>
+      </ol>
+    </div>
+    
     <div class="row">
       <button id="rsa-gen">Generate RSA-2048 Keypair</button>
       <button id="rsa-export" class="ghost">Export public (PEM)</button>
@@ -173,6 +212,19 @@
   <section id="panel-ecc" class="tabpanel card hidden" role="tabpanel" aria-labelledby="tab-ecc" tabindex="0">
     <h3>ECC (ECDH) Key Agreement + AES test</h3>
     <p class="muted">Generate two P-256 keypairs, derive shared secret both sides, HKDF to AES key, encrypt with A and decrypt with B to verify match.</p>
+    
+    <div style="background:rgba(15,23,42,0.03); border-left:4px solid #2563eb; padding:12px; border-radius:6px; margin:12px 0;">
+      <p style="margin:0 0 8px 0; font-weight:600; color:#1e40af;">How the simulation works:</p>
+      <ol style="margin:0; padding-left:20px; color:#334155;">
+        <li><strong>Generate keypairs:</strong> Click "Generate two ECDH keys" to create two separate P-256 elliptic curve keypairs (simulating two parties: Alice and Bob).</li>
+        <li><strong>Derive shared secret:</strong> Click "Derive shared secrets & test" to perform ECDH key agreement.</li>
+        <li><strong>Key agreement:</strong> Alice uses her private key + Bob's public key to derive a shared secret. Bob does the same (Alice private + Bob public). Both compute the same shared secret.</li>
+        <li><strong>Derive AES key (HKDF):</strong> Use HKDF (HMAC-based Key Derivation Function) with a random salt to convert the shared secret into a 128-bit AES key.</li>
+        <li><strong>Test encryption:</strong> Encrypt a test message with the derived AES key on Alice's side. Decrypt it on Bob's side using the same derived AES key.</li>
+        <li><strong>Verify:</strong> If decryption succeeds and the message matches, it proves both parties derived the same shared secret.</li>
+      </ol>
+    </div>
+    
     <div class="row">
       <button id="ecc-gen">Generate two ECDH keys</button>
       <button id="ecc-derive" class="ghost">Derive shared secrets & test</button>
@@ -299,7 +351,7 @@ const DES = (function(){
   const keyInput = document.getElementById('des-key');
   const outputSpan = document.getElementById('des-output');
 
-  function addText(x,y,t,size=16, color='#e8fff8'){
+  function addText(x,y,t,size=16, color='#0f172a'){
     const el = document.createElementNS('http://www.w3.org/2000/svg','text');
     el.setAttribute('x',x); el.setAttribute('y',y); el.setAttribute('fill',color);
     el.setAttribute('font-family','ui-monospace, monospace'); el.setAttribute('font-size',size); el.textContent = t;
@@ -377,7 +429,7 @@ const DES = (function(){
   let aesKey = null, lastCipher = null;
 
   function bytesToHex(b){ return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join(''); }
-  function addText(x,y,t,size=16,color='#eafff7'){
+  function addText(x,y,t,size=16,color='#0f172a'){
     const el = document.createElementNS('http://www.w3.org/2000/svg','text');
     el.setAttribute('x',x); el.setAttribute('y',y); el.setAttribute('fill',color);
     el.setAttribute('font-family','ui-monospace, monospace'); el.setAttribute('font-size',size); el.textContent = t;

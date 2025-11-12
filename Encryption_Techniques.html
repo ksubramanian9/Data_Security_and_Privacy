@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <!-- Chosen Palette: Calm Harmony (Light neutrals, soft blues, deep blue accent) -->
     <!-- Application Structure Plan: A thematic, single-page application with top navigation (Overview, Core Techniques, Data States, Quantum Threat, Future Solutions). This structure, chosen over a linear report, provides a logical, educational journey. The 'Overview' sets the stage. 'Core Techniques' and 'Data States' build foundational knowledge. 'Quantum Threat' establishes the primary challenge, leading directly to 'Future Solutions' (PQC, HE, QKD). Interactions include JS-powered tabs for comparison and an HTML-based interactive diagram for data states. -->
     <!-- Visualization & Content Choices: 1. Key Size Comparison (Goal: Compare) -> Bar Chart. Interaction: Tooltip. Justification: Visually demonstrates the efficiency of ECC vs. RSA for equivalent security. (Chart.js). 2. Core Techniques (Symmetric/Asymmetric) (Goal: Compare) -> JS-powered tabs. Interaction: Click to toggle. Justification: Clear side-by-side comparison of foundational concepts. (HTML/JS). 3. Data States Diagram (Goal: Organize/Inform) -> Interactive HTML/Tailwind Diagram. Interaction: Click to show details. Justification: Organizes encryption application by use case. (HTML/JS). 4. NIST PQC Timeline (Goal: Inform) -> HTML/Tailwind Timeline Diagram. Interaction: None. Justification: Shows the concrete progress of PQC standardization. (HTML/Tailwind). -->
@@ -93,7 +94,7 @@
         <nav class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">The State of Encryption</h1>
             <div id="navigation" class="flex flex-wrap justify-center gap-2">
-                <a href="index.html" class="nav-btn" style="text-decoration:none;display:inline-block;">⟵ Home</a>
+                <a href="index.html" class="nav-btn home-pill" aria-label="Home">⟵ Home</a>
                 <button class="nav-btn active" data-target="overview">Overview</button>
                 <button class="nav-btn" data-target="techniques">Core Techniques</button>
                 <button class="nav-btn" data-target="states">Data States</button>

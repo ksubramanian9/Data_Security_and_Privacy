@@ -6,6 +6,7 @@
     <title>Interactive Report: Data & Privacy Security</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -73,6 +74,7 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        /* home-pill styles moved to shared style.css */
     </style>
     <!-- Chosen Palette: "Calm Indigo & Slate" -->
     <!-- Application Structure Plan: A top-navigation SPA structure is chosen, dividing the complex report into four logical, high-level themes: 'Overview', 'The Threat Landscape', 'Defense & Methods', and 'Future Trends'. This provides a clear mental model for the user. The 'Threat' and 'Defense' sections, being the most dense, use a secondary JavaScript-driven tabbed interface. This prevents overwhelming the user with a single long scroll, allows for direct comparison (e.g., of different attack types or defense methods), and makes the information feel more like an explorable application than a static document. -->
@@ -94,6 +96,7 @@
                         <h1 class="text-2xl font-bold text-indigo-600">Data & Privacy Report</h1>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="index.html" class="nav-link home-pill inline-flex items-center px-1 pt-1 text-sm font-medium" aria-label="Home">⟵ Home</a>
                         <a href="#" class="nav-link active inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="home">Overview</a>
                         <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="threats">Threat Landscape</a>
                         <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="methods">Defense & Methods</a>
@@ -314,8 +317,10 @@
 
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
-                    e.preventDefault();
                     const pageId = link.getAttribute('data-page');
+                    // If no data-page attribute, let the link navigate normally (useful for Home links)
+                    if (!pageId) return;
+                    e.preventDefault();
                     
                     navLinks.forEach(nav => nav.classList.remove('active'));
                     link.classList.add('active');

@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <!-- Chosen Palette: Calm Harmony (Light neutrals, soft blues/greens, deep blue accent) -->
     <!-- Application Structure Plan: The SPA uses a thematic, single-page dashboard structure with top navigation (Overview, Key Threats, Regulations, Solutions, Future). This design, chosen over mirroring a linear report, allows users to non-linearly explore topics. The default 'Overview' provides key stats and themes. Other sections use interactive charts and clickable "tab-like" content reveals to manage information density and encourage exploration. This structure is designed for user-driven discovery of the report's key findings. -->
     <!-- Visualization & Content Choices: 1. Overview Stats (Cost, % Laws): (Goal: Inform) -> HTML/Tailwind Stat Cards. Interaction: None. Justification: High-impact, immediate info. (HTML/Tailwind). 2. Top Attack Vectors: (Goal: Compare) -> Horizontal Bar Chart. Interaction: Tooltip. Justification: Clear comparison of threat prevalence. (Chart.js). 3. Global Reg. Coverage: (Goal: Inform) -> Donut Chart. Interaction: Tooltip. Justification: Simple proportion. (Chart.js). 4. Zero Trust Pillars: (Goal: Organize) -> HTML/Tailwind flex-box diagram. Interaction: None. Justification: Visualizes a core concept without SVG. (HTML/Tailwind). 5. Detailed Text (Threats, Regs, Solutions): (Goal: Organize/Inform) -> JS-powered tabs/accordions. Interaction: Click to show/hide. Justification: Manages text density effectively. (JS). -->
@@ -88,7 +89,7 @@
         <nav class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">The State of Data Security & Privacy</h1>
             <div id="navigation" class="flex flex-wrap justify-center gap-2">
-                <a href="index.html" class="nav-btn" style="text-decoration:none;display:inline-block;">⟵ Home</a>
+                <a href="index.html" class="nav-btn home-pill" aria-label="Home">⟵ Home</a>
                 <button class="nav-btn active" data-target="overview">Overview</button>
                 <button class="nav-btn" data-target="threats">Key Threats</button>
                 <button class="nav-btn" data-target="regulations">Regulations</button>

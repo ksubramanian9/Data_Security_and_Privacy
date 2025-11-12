@@ -1,0 +1,30 @@
+/* Shared styles for the site
+   Contains small, safe, low-risk rules that multiple pages reference.
+   Only include non-invasive styles to avoid changing per-page layout unexpectedly.
+*/
+:root{
+  --home-bg: linear-gradient(90deg,#eef2ff,#e6f2ff);
+  --home-color: #1e40af;
+  --home-border: rgba(30,64,175,0.08);
+}
+
+.home-pill{
+  background: var(--home-bg) !important;
+  color: var(--home-color) !important;
+  padding: .45rem .75rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--home-border) !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .5rem !important;
+}
+
+.home-pill:hover{ box-shadow: 0 8px 20px rgba(30,64,175,0.06); transform: translateY(-1px); }
+
+/* Small utility: ensure pills used in headers don't shrink on narrow viewports */
+.home-pill[role="button"], .home-pill.button-like{ cursor: pointer; }
+
+/* Keep this file intentionally small. Add more shared rules here if you want
+   global consistency later (nav, typography, colors). */

@@ -74,6 +74,11 @@
             <h2 class="text-2xl font-bold mb-6 text-center">Security Explorer</h2>
             <ul class="space-y-2">
                 <li>
+                    <a href="index.html" class="nav-link text-lg block py-2 px-4 rounded" style="text-decoration:none;">
+                        <span class="mr-2">⟵</span>Home
+                    </a>
+                </li>
+                <li>
                     <a href="#" class="nav-link active text-lg block py-2 px-4 rounded" data-page="home">
                         <span class="mr-2">🏠</span>Overview
                     </a>
@@ -312,8 +317,11 @@
 
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
-                    e.preventDefault();
                     const pageId = link.getAttribute('data-page');
+                    // If the link does not have a data-page attribute, treat it as a normal navigation (e.g., Home)
+                    if (!pageId) return; // allow default behavior (follow href)
+
+                    e.preventDefault();
                     
                     navLinks.forEach(nav => nav.classList.remove('active'));
                     link.classList.add('active');

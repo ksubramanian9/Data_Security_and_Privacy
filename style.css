@@ -28,3 +28,14 @@
 
 /* Keep this file intentionally small. Add more shared rules here if you want
    global consistency later (nav, typography, colors). */
+
+/* Force a light-blue page background across all HTML pages.
+  Use !important so per-page internal styles that set backgrounds are
+  overridden without editing every HTML file. */
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #ADD8E6 !important; /* lightblue */
+  background-image: none !important;
+  color: inherit;
+}

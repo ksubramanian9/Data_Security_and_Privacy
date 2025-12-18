@@ -85,18 +85,34 @@
 </head>
 <body class="text-gray-800">
 
-    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <nav class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">The State of Data Security & Privacy</h1>
-            <div id="navigation" class="flex flex-wrap justify-center gap-2">
-                <a href="index.html" class="nav-btn home-pill" aria-label="Home">⟵ Home</a>
-                <button class="nav-btn active" data-target="overview">Overview</button>
-                <button class="nav-btn" data-target="threats">Key Threats</button>
-                <button class="nav-btn" data-target="regulations">Regulations</button>
-                <button class="nav-btn" data-target="solutions">Solutions</button>
-                <button class="nav-btn" data-target="future">Future Outlook</button>
-            </div>
-        </nav>
+    <header class="sticky top-0 z-50">
+        <div class="bg-slate-900 text-white shadow">
+            <nav class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="text-2xl font-bold">Data Security &amp; Privacy</div>
+                <div class="flex flex-wrap gap-2 text-sm font-medium">
+                    <a href="index.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Home</a>
+                    <a href="Data_Security_and_Privacy.html" class="px-3 py-2 rounded-lg bg-slate-800">Report</a>
+                    <a href="Encryption_Techniques.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Encryption</a>
+                    <a href="Data_Security_Privacy_Threats.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Threats</a>
+                    <a href="Data_Security_Privacy_Future_Trends.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Future Trends</a>
+                    <a href="Access_Control_and_Authentication.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Access Control</a>
+                    <a href="Encryption_Simulation.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Simulator</a>
+                    <a href="Lab_Instructions.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Labs</a>
+                </div>
+            </nav>
+        </div>
+        <div class="bg-white shadow-sm border-b border-gray-200">
+            <nav class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">The State of Data Security &amp; Privacy</h1>
+                <div id="navigation" class="flex flex-wrap justify-center gap-2">
+                    <button class="nav-btn active" data-target="overview">Overview</button>
+                    <button class="nav-btn" data-target="threats">Key Threats</button>
+                    <button class="nav-btn" data-target="regulations">Regulations</button>
+                    <button class="nav-btn" data-target="solutions">Solutions</button>
+                    <button class="nav-btn" data-target="future">Future Outlook</button>
+                </div>
+            </nav>
+        </div>
     </header>
 
     <main id="main-content" class="container mx-auto px-4 py-8 md:py-12">

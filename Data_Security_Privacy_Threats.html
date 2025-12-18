@@ -89,21 +89,37 @@
 <body class="bg-slate-50 font-inter text-gray-800">
 
     <div class="min-h-screen">
-        <header class="bg-white shadow-md sticky top-0 z-10">
-            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-2xl font-bold text-indigo-600">Data & Privacy Report</h1>
+        <header class="sticky top-0 z-10">
+            <div class="bg-slate-900 text-white shadow">
+                <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="text-2xl font-bold">Data Security &amp; Privacy</div>
+                    <div class="flex flex-wrap gap-2 text-sm font-medium">
+                        <a href="index.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Home</a>
+                        <a href="Data_Security_and_Privacy.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Report</a>
+                        <a href="Encryption_Techniques.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Encryption</a>
+                        <a href="Data_Security_Privacy_Threats.html" class="px-3 py-2 rounded-lg bg-slate-800">Threats</a>
+                        <a href="Data_Security_Privacy_Future_Trends.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Future Trends</a>
+                        <a href="Access_Control_and_Authentication.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Access Control</a>
+                        <a href="Encryption_Simulation.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Simulator</a>
+                        <a href="Lab_Instructions.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Labs</a>
                     </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="index.html" class="nav-link home-pill inline-flex items-center px-1 pt-1 text-sm font-medium" aria-label="Home">⟵ Home</a>
-                        <a href="#" class="nav-link active inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="home">Overview</a>
-                        <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="threats">Threat Landscape</a>
-                        <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="methods">Defense & Methods</a>
-                        <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="future">Future Trends</a>
+                </nav>
+            </div>
+            <div class="bg-white shadow-md border-b border-slate-200">
+                <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16">
+                        <div class="flex-shrink-0 flex items-center">
+                            <h1 class="text-2xl font-bold text-indigo-600">Data &amp; Privacy Report</h1>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="#" class="nav-link active inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="home">Overview</a>
+                            <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="threats">Threat Landscape</a>
+                            <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="methods">Defense &amp; Methods</a>
+                            <a href="#" class="nav-link inline-flex items-center px-1 pt-1 text-sm font-medium" data-page="future">Future Trends</a>
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            </div>
         </header>
 
         <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

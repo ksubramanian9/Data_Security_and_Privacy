@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AD23631: Data Privacy & Security Course Lab Activities</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            white-space: pre;
+        }
+
+        .lab-tab.active {
+            background-color: #eff6ff;
+            border-left-color: #2563eb;
+            color: #1d4ed8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="lg:hidden flex justify-between items-center p-4 bg-white shadow-md fixed w-full top-0 z-50">
+        <div class="font-bold text-xl text-brand-700">AD23631 Security</div>
+        <button onclick="toggleSidebar()" class="text-slate-600 focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+    </div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-slate-900 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
+        <div class="p-6 border-b border-slate-700">
+            <h1 class="text-2xl font-bold tracking-tight">Lab Activities</h1>
+            <p class="text-slate-400 text-sm mt-1">Data Privacy & Security</p>
+        </div>
+        <nav class="p-4 space-y-2">
+            <a href="#home" onclick="closeSidebar()" class="flex items-center p-3 rounded-lg hover:bg-slate-800 transition">
+                <i class="fas fa-home w-6 text-brand-500"></i>
+                <span class="font-medium">Overview</span>
+            </a>
+            <a href="#syllabus" onclick="closeSidebar()" class="flex items-center p-3 rounded-lg hover:bg-slate-800 transition">
+                <i class="fas fa-book w-6 text-brand-500"></i>
+                <span class="font-medium">Syllabus</span>
+            </a>
+            <a href="#labs" onclick="closeSidebar()" class="flex items-center p-3 rounded-lg hover:bg-slate-800 transition">
+                <i class="fas fa-flask w-6 text-brand-500"></i>
+                <span class="font-medium">Lab Manuals</span>
+            </a>
+            <a href="#projects" onclick="closeSidebar()" class="flex items-center p-3 rounded-lg hover:bg-slate-800 transition">
+                <i class="fas fa-rocket w-6 text-brand-500"></i>
+                <span class="font-medium">Project Design</span>
+            </a>
+            <a href="#resources" onclick="closeSidebar()" class="flex items-center p-3 rounded-lg hover:bg-slate-800 transition">
+                <i class="fas fa-link w-6 text-brand-500"></i>
+                <span class="font-medium">Resources</span>
+            </a>
+        </nav>
+        <div class="absolute bottom-0 w-full p-4 bg-slate-800 text-xs text-slate-400 text-center">
+            Semester VI • 4 Credits
+        </div>
+    </aside>
+
+    <main class="lg:ml-64 pt-20 lg:pt-0 min-h-screen">
+        
+        <section id="home" class="p-8 lg:p-12 bg-white border-b border-slate-200">
+            <div class="max-w-4xl">
+                <span class="inline-block py-1 px-3 rounded-full bg-brand-100 text-brand-700 text-sm font-semibold mb-4">Subject Code: AD23631</span>
+                <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Data Privacy and Security</h1>
+                <p class="text-lg text-slate-600 leading-relaxed mb-8">
+                    Welcome to the instructional hub for Semester VI. This course covers the fundamental principles of data privacy, the CIA Triad, cryptographic techniques, and modern strategies to mitigate privacy risks.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">
+                        <i class="fas fa-shield-halved text-3xl text-brand-600 mb-3"></i>
+                        <h3 class="font-bold text-lg">CIA Triad</h3>
+                        <p class="text-sm text-slate-500">Confidentiality, Integrity, and Availability principles.</p>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">
+                        <i class="fas fa-key text-3xl text-brand-600 mb-3"></i>
+                        <h3 class="font-bold text-lg">Cryptography</h3>
+                        <p class="text-sm text-slate-500">Implementation of AES, RSA, and Hashing algorithms.</p>
+                    </div>
+                    <div class="p-6 bg-slate-50 rounded-xl border border-slate-100 shadow-sm">
+                        <i class="fas fa-user-lock text-3xl text-brand-600 mb-3"></i>
+                        <h3 class="font-bold text-lg">Access Control</h3>
+                        <p class="text-sm text-slate-500">MFA, IAM policies, and Differential Privacy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="syllabus" class="p-8 lg:p-12">
+            <h2 class="text-3xl font-bold mb-8 flex items-center">
+                <span class="bg-brand-600 w-2 h-8 mr-3 rounded-full"></span>
+                Syllabus & Units
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unit I</div>
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Intro to Data Privacy</h3>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                        <li>Data Governance & Privacy Approaches</li>
+                        <li>Documenting Data for Use</li>
+                        <li>Defining Differential Privacy</li>
+                        <li>Key Concept: CIA Triad </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unit II</div>
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Encryption Techniques</h3>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                        <li>Symmetric vs. Asymmetric Encryption</li>
+                        <li>Algorithms: AES, RSA, DES</li>
+                        <li>Encryption Standards & Applications </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unit III</div>
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Access Control & Auth</h3>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                        <li>Hashing & Digital Signatures</li>
+                        <li>Biometric Authentication</li>
+                        <li>Multi-Factor Authentication (MFA) </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unit IV</div>
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Data Attacks & Threats</h3>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                        <li>Vulnerability Analysis</li>
+                        <li>Privacy Attacks & Mitigation</li>
+                        <li>Data Loss Prevention (DLP) </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition md:col-span-2 xl:col-span-1">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Unit V</div>
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Emerging Trends</h3>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 text-sm">
+                        <li>ID4D Initiative & Identity Life Cycle</li>
+                        <li>Assurance Levels of Authentication</li>
+                        <li>Continuous Authentication</li>
+                        <li>Cancellable Authentication </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="labs" class="p-8 lg:p-12 bg-slate-100 min-h-screen">
+            <h2 class="text-3xl font-bold mb-2 flex items-center">
+                <span class="bg-brand-600 w-2 h-8 mr-3 rounded-full"></span>
+                Lab Manuals
+            </h2>
+            <p class="text-slate-600 mb-8">Select a lab from the list to view the complete step-by-step instructions.</p>
+
+            <div class="flex flex-col lg:flex-row gap-8 items-start">
+                
+                <div class="w-full lg:w-1/4 flex flex-col space-y-2 sticky top-24">
+                    <button onclick="switchLab('lab1')" id="tab-lab1" class="lab-tab active text-left px-5 py-4 rounded-lg bg-white shadow-sm border-l-4 border-transparent hover:bg-slate-50 transition font-medium">
+                        Lab 1: Secure Data Communication
+                    </button>
+                    <button onclick="switchLab('lab2')" id="tab-lab2" class="lab-tab text-left px-5 py-4 rounded-lg bg-white shadow-sm border-l-4 border-transparent hover:bg-slate-50 transition font-medium">
+                        Lab 2: DB Access Control
+                    </button>
+                    <button onclick="switchLab('lab3')" id="tab-lab3" class="lab-tab text-left px-5 py-4 rounded-lg bg-white shadow-sm border-l-4 border-transparent hover:bg-slate-50 transition font-medium">
+                        Lab 3: Multi-Factor Auth (MFA)
+                    </button>
+                    <button onclick="switchLab('lab4')" id="tab-lab4" class="lab-tab text-left px-5 py-4 rounded-lg bg-white shadow-sm border-l-4 border-transparent hover:bg-slate-50 transition font-medium">
+                        Lab 4: Data Breach Case Study
+                    </button>
+                    <button onclick="switchLab('lab5')" id="tab-lab5" class="lab-tab text-left px-5 py-4 rounded-lg bg-white shadow-sm border-l-4 border-transparent hover:bg-slate-50 transition font-medium">
+                        Lab 5: Cloud IAM (AWS)
+                    </button>
+                    <button onclick="switchLab('lab6')" id="tab-lab6" class="lab-tab text-left px-5 py-4 rounded-lg bg-white shadow-sm border-l-4 border-transparent hover:bg-slate-50 transition font-medium">
+                        Lab 6: Differential Privacy
+                    </button>
+                </div>
+
+                <div class="w-full lg:w-3/4 bg-white rounded-xl shadow-sm border border-slate-200 p-8 min-h-[600px]">
+                    
+                    <div id="lab1" class="lab-content">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 1: Implement Secure Data Communication with AES and RSA</h3>
+                        <p class="text-slate-600 mb-6">In this lab, you will generate RSA keys, encrypt a symmetric key with the public key, and encrypt a file using AES.</p>
+                        
+                        <h4 class="font-bold text-lg mb-2">Step 1: Generate RSA Keys</h4>
+                        <p class="mb-2">Generate 2048-bit RSA private and public keys using OpenSSL.</p>
+                        <div class="code-block">
+# Generate a 2048-bit RSA private key
+openssl genrsa -out private.pem 2048
+
+# Derive the public key from the private key
+openssl rsa -in private.pem -pubout -out public.pem</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Encrypt a Symmetric Key with RSA</h4>
+                        <p class="mb-2">Generate a random 256-bit AES key and encrypt it with the RSA public key.</p>
+                        <div class="code-block">
+# Generate a random 256-bit AES key
+aes_key=$(openssl rand -base64 32)
+
+# Encrypt the AES key with the RSA public key
+encrypted_aes_key=$(openssl rsautl -encrypt -inkey public.pem -pubin -in $aes_key -out aes.key.enc)</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Encrypt a File with AES</h4>
+                        <p class="mb-2">Encrypt a sample file (plaintext.txt) using OpenSSL's AES-256-CBC algorithm.</p>
+                        <div class="code-block">
+# Create a sample plaintext file
+echo "Hello, World!" > plaintext.txt
+
+# Set the password for encryption (keep secret)
+aes_password="my_secret_password"
+
+# Encrypt the plaintext file with AES
+openssl enc -aes-256-cbc -salt -in plaintext.txt -out ciphertext.enc -pass file:$aes_password</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 4: Decrypt the AES Key and File</h4>
+                        <p class="mb-2">Decrypt the AES key using the RSA private key, then decrypt the file.</p>
+                        <div class="code-block">
+# Decrypt the encrypted AES key with the RSA private key
+decrypted_aes_key=$(openssl rsautl -decrypt -inkey private.pem -pubin -in aes.key.enc -out aes.key.dec)
+
+# Decrypt the ciphertext file with the decrypted AES key
+openssl enc -aes-256-cbc -d -salt -in ciphertext.enc -out decrypted_ciphertext.txt -pass pass:$aes_password
+
+# Verify content matches
+diff plaintext.txt decrypted_ciphertext.txt</div>
+                    </div>
+
+                    <div id="lab2" class="lab-content hidden">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 2: Configure Access Control Policies in a Database</h3>
+                        <p class="text-slate-600 mb-6">Implement access control matrices (ACMs) and granular privileges in MySQL/PostgreSQL.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Step 1: Create a Database</h4>
+                        <div class="code-block">
+CREATE DATABASE big_data_project;
+USE big_data_project;</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Define Roles and Users</h4>
+                        <p class="mb-2">Define three roles: Analyst, Data Engineer, and Admin.</p>
+                        <div class="code-block">
+-- Create roles
+CREATE ROLE analyst;
+CREATE ROLE data_engineer;
+CREATE ROLE admin;
+
+-- Create users with assigned roles
+CREATE USER 'analyst_user'@'%' IDENTIFIED BY 'password';
+GRANT ANALYST privileges TO 'analyst_user'@'%';
+
+CREATE USER 'data_engineer_user'@'%' IDENTIFIED BY 'password';
+GRANT DATA_ENGINEER privileges TO 'data_engineer_user'@'%';</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Grant Privileges</h4>
+                        <p class="mb-2">Assign SELECT/INSERT/UPDATE permissions to specific tables.</p>
+                        <div class="code-block">
+-- Grant SELECT on patient_records for Analysts
+GRANT SELECT ON patient_records TO 'analyst_user';
+
+-- Grant INSERT, UPDATE, DELETE on transaction_logs for Data Engineers
+GRANT INSERT, UPDATE, DELETE ON transaction_logs TO 'data_engineer_user';</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 4: Audit Logging</h4>
+                        <p class="mb-2">Enable audit logging to monitor access.</p>
+                        <div class="code-block">
+SET GLOBAL log_output = 'TABLE';
+-- Check logs
+SELECT * FROM mysql.general_log;</div>
+                    </div>
+
+                    <div id="lab3" class="lab-content hidden">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 3: Implement Multi-Factor Authentication (MFA)</h3>
+                        <p class="text-slate-600 mb-6">Use Python's <code>pyotp</code> library to generate TOTP codes for secure login.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Step 1: Setup Library</h4>
+                        <div class="code-block">
+pip install pyotp twilio smtplib</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Generate TOTP</h4>
+                        <p class="mb-2">Create a TOTP object and generate a code.</p>
+                        <div class="code-block">
+import pyotp
+import time
+
+# Create a TOTP object with a secret key
+totp = pyotp.TOTP('base32secret3232')
+print("Current OTP:", totp.now())</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Simulate Verification</h4>
+                        <p class="mb-2">Verify user input against the generated TOTP.</p>
+                        <div class="code-block">
+# Prompt user for code
+user_code = input("Enter the OTP you received: ")
+
+# Verify
+if totp.verify(user_code):
+    print("Authentication Successful!")
+else:
+    print("Invalid Code.")</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 4: Store Minimal State</h4>
+                        <p class="mb-2">Prevent reuse by storing a timestamp in the session.</p>
+                        <div class="code-block">
+# Store timestamp to avoid replay attacks
+user_session['totp_state'] = time.time()</div>
+                    </div>
+
+                    <div id="lab4" class="lab-content hidden">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 4: Case Study - Capital One Data Breach</h3>
+                        <p class="text-slate-600 mb-6">Analyze the 2019 breach and design a response plan.</p>
+
+                        <div class="bg-red-50 p-4 rounded-lg border border-red-100 mb-6">
+                            <h4 class="font-bold text-red-800 mb-2">Incident Overview</h4>
+                            <ul class="list-disc list-inside text-red-700 text-sm space-y-1">
+                                <li><strong>Target:</strong> Capital One (2019)</li>
+                                <li><strong>Impact:</strong> 100M+ customers exposed.</li>
+                                <li><strong>Vulnerabilities:</strong> SSRF (Server Side Request Forgery), Misconfigured WAF.</li>
+                            </ul>
+                        </div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 1: Analyze Causes</h4>
+                        <ul class="list-disc list-inside mb-4 text-slate-700">
+                            <li><strong>Technical:</strong> Unpatched vulnerabilities, Misconfigured firewalls.</li>
+                            <li><strong>Organizational:</strong> Inadequate access controls, Insufficient monitoring.</li>
+                        </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Response Plan</h4>
+                        <p class="mb-2">Design an effective response plan using FTC guidelines.</p>
+                        <ul class="list-disc list-inside mb-4 text-slate-700 space-y-2">
+                            <li><strong>Secure Systems:</strong> Immediately patch vulnerabilities and close access.</li>
+                            <li><strong>Forensics:</strong> Engage experts to identify root cause.</li>
+                            <li><strong>Notification:</strong> Inform stakeholders honestly without revealing sensitive info.</li>
+                        </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Python Response Class</h4>
+                        <div class="code-block">
+class ResponsePlan:
+    def __init__(self):
+        self.severity = None
+        self.action = None
+
+    def update(self, severity, action):
+        self.severity = severity
+        self.action = action
+        print(f"Plan Updated: {severity} - {action}")
+
+breach = ResponsePlan()
+breach.update("Severe", "Notify affected users and patch WAF")</div>
+                    </div>
+
+                    <div id="lab5" class="lab-content hidden">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 5: Cloud IAM (AWS)</h3>
+                        <p class="text-slate-600 mb-6">Create Users, Groups, and define JSON Policies in AWS IAM.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Step 1: Define Policies</h4>
+                        <p class="mb-2">Create a JSON document that defines allowed actions (e.g., Read S3).</p>
+                        <div class="code-block">
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowS3ReadAccess",
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-secure-bucket/*"
+    }
+  ]
+}</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Create Users & Assign Roles</h4>
+                        <ul class="list-disc list-inside mb-4 text-slate-700">
+                            <li>Create users in IAM Console (Analyst, Engineer).</li>
+                            <li>Group users into roles to simplify permission management.</li>
+                            <li>Attach the custom policy created above.</li>
+                        </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Enable MFA</h4>
+                        <p class="mb-2">Rotate access keys every 90 days and enable MFA for root accounts.</p>
+                    </div>
+
+                    <div id="lab6" class="lab-content hidden">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 6: Differential Privacy</h3>
+                        <p class="text-slate-600 mb-6">Implement Laplace Noise to protect data queries.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Step 1: Define Query</h4>
+                        <p class="mb-2">Target Query: Average Score of students.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Implement Laplace Noise</h4>
+                        <p class="mb-2">Add noise drawn from a Laplace distribution scaled to sensitivity.</p>
+                        <div class="code-block">
+import numpy as np
+from scipy import stats
+
+def laplace_noise(true_answer, epsilon, delta):
+    # Calculate scale (sigma)
+    sigma = np.sqrt(2 * epsilon / delta)
+    
+    # Add noise
+    noise = stats.laplace.rvs(loc=0, scale=sigma)
+    return true_answer + noise
+
+# Example Usage
+true_avg = 85.5
+epsilon = 1.0  # Privacy budget
+noisy_avg = laplace_noise(true_avg, epsilon, 1.0)
+print(f"True: {true_avg}, Noisy: {noisy_avg}")</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Evaluate Accuracy</h4>
+                        <p class="mb-2">Observe that as Epsilon increases (less privacy), accuracy improves (error decreases).</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="p-8 lg:p-12 border-t border-slate-200">
+            <h2 class="text-3xl font-bold mb-8 flex items-center">
+                <span class="bg-brand-600 w-2 h-8 mr-3 rounded-full"></span>
+                Project Design
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                 <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold mb-4 text-brand-700">Core Principles</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Minimization:</strong> Collect only necessary data.</span></li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Security:</strong> HTTPS/TLS for transit, Encryption for storage.</span></li>
+                        <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i><span><strong>Privacy:</strong> k-anonymity & Differential Privacy.</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold mb-4 text-brand-700">Project Ideas</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <strong class="block text-slate-800">🌾 Agriculture</strong>
+                            <span class="text-slate-600 text-sm">Secure IoT sensor communication and anonymize farmer GPS data.</span>
+                        </div>
+                        <div>
+                            <strong class="block text-slate-800">🏥 Healthcare</strong>
+                            <span class="text-slate-600 text-sm">Epidemic monitoring using aggregated location data.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); }
+
+        // Lab Tab Logic
+        function switchLab(labId) {
+            // Hide all content
+            document.querySelectorAll('.lab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Remove active state from all tabs
+            document.querySelectorAll('.lab-tab').forEach(el => {
+                el.classList.remove('active', 'bg-brand-50', 'border-brand-600', 'text-brand-700');
+                el.classList.add('border-transparent');
+            });
+
+            // Show selected content
+            document.getElementById(labId).classList.remove('hidden');
+            
+            // Activate selected tab
+            const activeTab = document.getElementById('tab-' + labId);
+            activeTab.classList.add('active');
+            activeTab.classList.remove('border-transparent');
+        }
+    </script>
+</body>
+</html>

@@ -225,178 +225,246 @@
                     
                     <div id="lab1" class="lab-content">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 1: Implement Secure Data Communication with AES and RSA</h3>
-                        <p class="text-slate-600 mb-6">In this lab, you will generate RSA keys, encrypt a symmetric key with the public key, and encrypt a file using AES.</p>
-                        
-                        <h4 class="font-bold text-lg mb-2">Step 1: Generate RSA Keys</h4>
-                        <p class="mb-2">Generate 2048-bit RSA private and public keys using OpenSSL.</p>
+                        <p class="text-slate-600 mb-6">Generate modern RSA keys, wrap an AES key with OAEP, encrypt data with AES-256-CBC, and verify integrity/cleanup.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Step 1: Generate RSA Keys (2048-bit)</h4>
+                        <p class="mb-2">Use the supported <code>pkey</code>/<code>pkeyutl</code> commands instead of deprecated rsautl.</p>
                         <div class="code-block">
 # Generate a 2048-bit RSA private key
-openssl genrsa -out private.pem 2048
+openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 
 # Derive the public key from the private key
-openssl rsa -in private.pem -pubout -out public.pem</div>
+openssl pkey -in private.pem -pubout -out public.pem
 
-                        <h4 class="font-bold text-lg mb-2">Step 2: Encrypt a Symmetric Key with RSA</h4>
-                        <p class="mb-2">Generate a random 256-bit AES key and encrypt it with the RSA public key.</p>
+# Restrict permissions on private key (POSIX)
+chmod 600 private.pem</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Wrap a 256-bit AES Key with RSA-OAEP</h4>
+                        <p class="mb-2">Generate a binary AES key file, then encrypt it with the public key using OAEP padding.</p>
                         <div class="code-block">
-# Generate a random 256-bit AES key
-aes_key=$(openssl rand -base64 32)
+# Generate a random 256-bit AES key (binary)
+openssl rand -out aes.key 32
 
-# Encrypt the AES key with the RSA public key
-encrypted_aes_key=$(openssl rsautl -encrypt -inkey public.pem -pubin -in $aes_key -out aes.key.enc)</div>
+# Encrypt (wrap) the AES key using RSA-OAEP
+openssl pkeyutl -encrypt -inkey public.pem -pubin -in aes.key \
+  -pkeyopt rsa_padding_mode:oaep -out aes.key.enc</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 3: Encrypt a File with AES</h4>
-                        <p class="mb-2">Encrypt a sample file (plaintext.txt) using OpenSSL's AES-256-CBC algorithm.</p>
+                        <h4 class="font-bold text-lg mb-2">Step 3: Encrypt a File with AES-256-CBC</h4>
+                        <p class="mb-2">Use the generated key material, derive IV from random bytes, and store non-secret metadata alongside ciphertext.</p>
                         <div class="code-block">
 # Create a sample plaintext file
 echo "Hello, World!" > plaintext.txt
 
-# Set the password for encryption (keep secret)
-aes_password="my_secret_password"
+# Generate a random IV (16 bytes)
+openssl rand -out iv.bin 16
 
-# Encrypt the plaintext file with AES
-openssl enc -aes-256-cbc -salt -in plaintext.txt -out ciphertext.enc -pass file:$aes_password</div>
+# Encrypt using the binary key and IV
+openssl enc -aes-256-cbc -K $(xxd -p aes.key) -iv $(xxd -p iv.bin) \
+  -in plaintext.txt -out ciphertext.enc</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 4: Decrypt the AES Key and File</h4>
-                        <p class="mb-2">Decrypt the AES key using the RSA private key, then decrypt the file.</p>
+                        <h4 class="font-bold text-lg mb-2">Step 4: Unwrap and Decrypt</h4>
+                        <p class="mb-2">Recover the AES key with the private key, decrypt the file, and verify integrity.</p>
                         <div class="code-block">
-# Decrypt the encrypted AES key with the RSA private key
-decrypted_aes_key=$(openssl rsautl -decrypt -inkey private.pem -pubin -in aes.key.enc -out aes.key.dec)
+# Decrypt (unwrap) the AES key with the private key
+openssl pkeyutl -decrypt -inkey private.pem -in aes.key.enc \
+  -pkeyopt rsa_padding_mode:oaep -out aes.key.dec
 
-# Decrypt the ciphertext file with the decrypted AES key
-openssl enc -aes-256-cbc -d -salt -in ciphertext.enc -out decrypted_ciphertext.txt -pass pass:$aes_password
+# Decrypt using the recovered key and stored IV
+openssl enc -d -aes-256-cbc -K $(xxd -p aes.key.dec) -iv $(xxd -p iv.bin) \
+  -in ciphertext.enc -out decrypted_ciphertext.txt
 
 # Verify content matches
-diff plaintext.txt decrypted_ciphertext.txt</div>
+diff plaintext.txt decrypted_ciphertext.txt
+
+# (Optional) Generate and verify a SHA-256 checksum
+sha256sum plaintext.txt decrypted_ciphertext.txt</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 5: Cleanup & Safety</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Shred keys after use in shared labs: <code>shred -u private.pem aes.key*</code>.</li>
+                            <li>Keep <code>iv.bin</code> and <code>aes.key.enc</code> with ciphertext; keep <code>private.pem</code> offline.</li>
+                            <li>Document who holds each key and rotate keys for new exercises.</li>
+                        </ul>
                     </div>
-
-                    <div id="lab2" class="lab-content hidden">
+<div id="lab2" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 2: Configure Access Control Policies in a Database</h3>
-                        <p class="text-slate-600 mb-6">Implement access control matrices (ACMs) and granular privileges in MySQL/PostgreSQL.</p>
+                        <p class="text-slate-600 mb-6">Create sample tables, roles, and grants in MySQL or PostgreSQL; verify and revoke privileges; inspect audit events.</p>
 
-                        <h4 class="font-bold text-lg mb-2">Step 1: Create a Database</h4>
+                        <h4 class="font-bold text-lg mb-2">Step 1: Create a Database & Tables</h4>
                         <div class="code-block">
+-- MySQL example
 CREATE DATABASE big_data_project;
-USE big_data_project;</div>
+USE big_data_project;
+
+CREATE TABLE patient_records (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50),
+  diagnosis VARCHAR(100)
+);
+
+CREATE TABLE transaction_logs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  actor VARCHAR(50),
+  action VARCHAR(50)
+);
+
+INSERT INTO patient_records (name, diagnosis) VALUES
+('Ada', 'Hypertension'), ('Grace', 'Migraine');</div>
 
                         <h4 class="font-bold text-lg mb-2">Step 2: Define Roles and Users</h4>
-                        <p class="mb-2">Define three roles: Analyst, Data Engineer, and Admin.</p>
+                        <p class="mb-2">Use roles to group privileges; then assign roles to users.</p>
                         <div class="code-block">
 -- Create roles
 CREATE ROLE analyst;
 CREATE ROLE data_engineer;
 CREATE ROLE admin;
 
--- Create users with assigned roles
-CREATE USER 'analyst_user'@'%' IDENTIFIED BY 'password';
-GRANT ANALYST privileges TO 'analyst_user'@'%';
+-- Create users
+CREATE USER 'analyst_user'@'%' IDENTIFIED BY 'P@ssw0rd!';
+CREATE USER 'data_engineer_user'@'%' IDENTIFIED BY 'P@ssw0rd!';
 
-CREATE USER 'data_engineer_user'@'%' IDENTIFIED BY 'password';
-GRANT DATA_ENGINEER privileges TO 'data_engineer_user'@'%';</div>
+-- Assign roles to users
+GRANT analyst TO 'analyst_user'@'%';
+GRANT data_engineer TO 'data_engineer_user'@'%';</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 3: Grant Privileges</h4>
-                        <p class="mb-2">Assign SELECT/INSERT/UPDATE permissions to specific tables.</p>
+                        <h4 class="font-bold text-lg mb-2">Step 3: Grant & Verify Privileges</h4>
+                        <p class="mb-2">Grant privileges to roles (not users) and test with <code>SET ROLE</code>.</p>
                         <div class="code-block">
--- Grant SELECT on patient_records for Analysts
-GRANT SELECT ON patient_records TO 'analyst_user';
+-- Grants to roles
+GRANT SELECT ON patient_records TO analyst;
+GRANT INSERT, UPDATE, DELETE ON transaction_logs TO data_engineer;
+GRANT ALL PRIVILEGES ON *.* TO admin WITH GRANT OPTION;
 
--- Grant INSERT, UPDATE, DELETE on transaction_logs for Data Engineers
-GRANT INSERT, UPDATE, DELETE ON transaction_logs TO 'data_engineer_user';</div>
+-- Validate as analyst
+SET ROLE analyst;
+SELECT * FROM patient_records; -- succeeds
+INSERT INTO patient_records VALUES (999, 'Test', 'Should fail'); -- should fail
 
-                        <h4 class="font-bold text-lg mb-2">Step 4: Audit Logging</h4>
-                        <p class="mb-2">Enable audit logging to monitor access.</p>
+-- Validate as data_engineer
+SET ROLE data_engineer;
+INSERT INTO transaction_logs (actor, action) VALUES ('engineer', 'import');
+SELECT * FROM transaction_logs; -- should succeed</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 4: Revoke & Audit</h4>
                         <div class="code-block">
+-- Revoke UPDATE for data_engineer role
+REVOKE UPDATE ON transaction_logs FROM data_engineer;
+
+-- MySQL audit (table-based general log)
 SET GLOBAL log_output = 'TABLE';
--- Check logs
-SELECT * FROM mysql.general_log;</div>
+SET GLOBAL general_log = 'ON';
+SELECT event_time, user_host, argument FROM mysql.general_log
+  WHERE command_type = 'Query' ORDER BY event_time DESC LIMIT 5;
+
+-- PostgreSQL note: enable pgaudit extension and query pgaudit.log</div>
+
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Document least-privilege decisions (why each grant exists).</li>
+                            <li>Show how to disable logging after the lab: <code>SET GLOBAL general_log = 'OFF';</code></li>
+                            <li>Rotate passwords or drop test users when finished.</li>
+                        </ul>
                     </div>
-
-                    <div id="lab3" class="lab-content hidden">
+<div id="lab3" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 3: Implement Multi-Factor Authentication (MFA)</h3>
-                        <p class="text-slate-600 mb-6">Use Python's <code>pyotp</code> library to generate TOTP codes for secure login.</p>
+                        <p class="text-slate-600 mb-6">Create a virtual environment, onboard a TOTP secret with a QR code, and verify codes with drift/rate-limit protections.</p>
 
-                        <h4 class="font-bold text-lg mb-2">Step 1: Setup Library</h4>
+                        <h4 class="font-bold text-lg mb-2">Step 1: Isolate & Install Dependencies</h4>
                         <div class="code-block">
-pip install pyotp twilio smtplib</div>
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install pyotp qrcode[pil]</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 2: Generate TOTP</h4>
-                        <p class="mb-2">Create a TOTP object and generate a code.</p>
+                        <h4 class="font-bold text-lg mb-2">Step 2: Provision a User Secret</h4>
+                        <p class="mb-2">Generate a random Base32 secret per user and produce a provisioning URI for authenticator apps.</p>
                         <div class="code-block">
-import pyotp
+import pyotp, qrcode
+
+# Generate per-user secret
+secret = pyotp.random_base32()
+totp = pyotp.TOTP(secret)
+
+# Provisioning URI (scan with Google Authenticator / Authy)
+uri = totp.provisioning_uri(name="student@example.com", issuer_name="AD23631-MFA-Lab")
+qrcode.make(uri).save("totp-qr.png")
+print("Secret:", secret)
+print("URI saved to totp-qr.png")</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 3: Verify with Clock Drift Allowance</h4>
+                        <p class="mb-2">Accept codes within one window for minor skew and implement basic retry limits.</p>
+                        <div class="code-block">
 import time
 
-# Create a TOTP object with a secret key
-totp = pyotp.TOTP('base32secret3232')
-print("Current OTP:", totp.now())</div>
-
-                        <h4 class="font-bold text-lg mb-2">Step 3: Simulate Verification</h4>
-                        <p class="mb-2">Verify user input against the generated TOTP.</p>
-                        <div class="code-block">
-# Prompt user for code
-user_code = input("Enter the OTP you received: ")
-
-# Verify
-if totp.verify(user_code):
-    print("Authentication Successful!")
+MAX_ATTEMPTS = 3
+attempts = 0
+while attempts < MAX_ATTEMPTS:
+    code = input("Enter the 6-digit code: ")
+    if totp.verify(code, valid_window=1):  # allows +/-30s drift
+        print("Authentication Successful")
+        break
+    attempts += 1
+    print("Invalid code. Attempts left:", MAX_ATTEMPTS - attempts)
 else:
-    print("Invalid Code.")</div>
+    print("Too many failures — account locked, alert security team")</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 4: Store Minimal State</h4>
-                        <p class="mb-2">Prevent reuse by storing a timestamp in the session.</p>
-                        <div class="code-block">
-# Store timestamp to avoid replay attacks
-user_session['totp_state'] = time.time()</div>
+                        <h4 class="font-bold text-lg mb-2">Step 4: Secure Secret Handling</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Store secrets in environment variables or a secrets manager, not source control.</li>
+                            <li>Rotate secrets on device loss and enforce per-session nonce/state to prevent replay.</li>
+                            <li>Deactivate the virtual environment after testing: <code>deactivate</code>.</li>
+                        </ul>
                     </div>
-
-                    <div id="lab4" class="lab-content hidden">
+<div id="lab4" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 4: Case Study - Capital One Data Breach</h3>
-                        <p class="text-slate-600 mb-6">Analyze the 2019 breach and design a response plan.</p>
+                        <p class="text-slate-600 mb-6">Build a timeline, map controls, and run a tabletop drill based on the 2019 Capital One breach.</p>
 
                         <div class="bg-red-50 p-4 rounded-lg border border-red-100 mb-6">
                             <h4 class="font-bold text-red-800 mb-2">Incident Overview</h4>
                             <ul class="list-disc list-inside text-red-700 text-sm space-y-1">
                                 <li><strong>Target:</strong> Capital One (2019)</li>
                                 <li><strong>Impact:</strong> 100M+ customers exposed.</li>
-                                <li><strong>Vulnerabilities:</strong> SSRF (Server Side Request Forgery), Misconfigured WAF.</li>
+                                <li><strong>Root causes:</strong> SSRF exploit + misconfigured WAF & IAM roles.</li>
                             </ul>
                         </div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 1: Analyze Causes</h4>
-                        <ul class="list-disc list-inside mb-4 text-slate-700">
-                            <li><strong>Technical:</strong> Unpatched vulnerabilities, Misconfigured firewalls.</li>
-                            <li><strong>Organizational:</strong> Inadequate access controls, Insufficient monitoring.</li>
+                        <h4 class="font-bold text-lg mb-2">Step 1: Build a Timeline</h4>
+                        <ul class="list-disc list-inside mb-4 text-slate-700 space-y-1">
+                            <li>Collect events: vulnerability exploit, data exfil, detection, response, disclosure.</li>
+                            <li>Record sources (CloudTrail, WAF logs) and note detection gaps.</li>
                         </ul>
 
-                        <h4 class="font-bold text-lg mb-2">Step 2: Response Plan</h4>
-                        <p class="mb-2">Design an effective response plan using FTC guidelines.</p>
-                        <ul class="list-disc list-inside mb-4 text-slate-700 space-y-2">
-                            <li><strong>Secure Systems:</strong> Immediately patch vulnerabilities and close access.</li>
-                            <li><strong>Forensics:</strong> Engage experts to identify root cause.</li>
-                            <li><strong>Notification:</strong> Inform stakeholders honestly without revealing sensitive info.</li>
+                        <h4 class="font-bold text-lg mb-2">Step 2: Map Controls to Frameworks</h4>
+                        <ul class="list-disc list-inside mb-4 text-slate-700 space-y-1">
+                            <li>Map missing controls to NIST CSF (Identify/Protect/Detect/Respond/Recover).</li>
+                            <li>Propose fixes: strict IAM roles, instance metadata protection, patched WAF rules, VPC egress limits.</li>
                         </ul>
 
-                        <h4 class="font-bold text-lg mb-2">Step 3: Python Response Class</h4>
-                        <div class="code-block">
-class ResponsePlan:
-    def __init__(self):
-        self.severity = None
-        self.action = None
+                        <h4 class="font-bold text-lg mb-2">Step 3: Tabletop Drill Script</h4>
+                        <ul class="list-disc list-inside mb-4 text-slate-700 space-y-1">
+                            <li>Roles: Incident Commander, Comms Lead, Cloud Engineer, Security Analyst.</li>
+                            <li>Decision points: contain access keys, rotate credentials, isolate workloads, notify regulators.</li>
+                            <li>Deliverables: evidence log, owner/action/deadline table, post-incident hardening checklist.</li>
+                        </ul>
 
-    def update(self, severity, action):
-        self.severity = severity
-        self.action = action
-        print(f"Plan Updated: {severity} - {action}")
-
-breach = ResponsePlan()
-breach.update("Severe", "Notify affected users and patch WAF")</div>
+                        <h4 class="font-bold text-lg mb-2">Step 4: Postmortem & Hardening</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Document blast radius, data classification, and customer impact.</li>
+                            <li>Implement compensating controls: IMDSv2, rotate keys, least-privilege WAF/IAM, alerting on anomalous role usage.</li>
+                            <li>Schedule retests and track owners in a playbook template.</li>
+                        </ul>
                     </div>
-
-                    <div id="lab5" class="lab-content hidden">
+<div id="lab5" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 5: Cloud IAM (AWS)</h3>
-                        <p class="text-slate-600 mb-6">Create Users, Groups, and define JSON Policies in AWS IAM.</p>
+                        <p class="text-slate-600 mb-6">Set up a sandbox account, create IAM users/groups/policies via CLI, validate permissions, and clean up safely.</p>
 
-                        <h4 class="font-bold text-lg mb-2">Step 1: Define Policies</h4>
-                        <p class="mb-2">Create a JSON document that defines allowed actions (e.g., Read S3).</p>
+                        <h4 class="font-bold text-lg mb-2">Step 1: Sandbox & CLI Setup</h4>
+                        <ul class="list-disc list-inside mb-4 text-slate-700 space-y-1">
+                            <li>Use a training/sandbox AWS account to avoid production risk.</li>
+                            <li>Install/verify AWS CLI: <code>aws --version</code>, then <code>aws configure</code> with sandbox keys.</li>
+                            <li>Enable MFA on the root account before proceeding.</li>
+                        </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Step 2: Define a Least-Privilege Policy</h4>
                         <div class="code-block">
 {
   "Version": "2012-10-17",
@@ -404,52 +472,82 @@ breach.update("Severe", "Notify affected users and patch WAF")</div>
     {
       "Sid": "AllowS3ReadAccess",
       "Effect": "Allow",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::my-secure-bucket/*"
+      "Action": ["s3:GetObject", "s3:ListBucket"],
+      "Resource": [
+        "arn:aws:s3:::my-secure-bucket",
+        "arn:aws:s3:::my-secure-bucket/*"
+      ]
     }
   ]
 }</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 2: Create Users & Assign Roles</h4>
-                        <ul class="list-disc list-inside mb-4 text-slate-700">
-                            <li>Create users in IAM Console (Analyst, Engineer).</li>
-                            <li>Group users into roles to simplify permission management.</li>
-                            <li>Attach the custom policy created above.</li>
+                        <h4 class="font-bold text-lg mb-2">Step 3: Create Groups, Users, and Attach Policy</h4>
+                        <div class="code-block">
+# Create a group and attach policy
+aws iam create-group --group-name DataAnalysts
+aws iam create-policy --policy-name S3ReadOnly --policy-document file://s3-read.json
+aws iam attach-group-policy --group-name DataAnalysts \
+  --policy-arn arn:aws:iam::<ACCOUNT_ID>:policy/S3ReadOnly
+
+# Create users and add to group
+aws iam create-user --user-name analyst-user
+aws iam add-user-to-group --user-name analyst-user --group-name DataAnalysts
+
+# Create access keys for the user (store securely!)
+aws iam create-access-key --user-name analyst-user</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 4: Validate & Simulate</h4>
+                        <div class="code-block">
+# Verify identity and permissions
+aws sts get-caller-identity
+aws iam get-user --user-name analyst-user
+
+# Test S3 access with the user's credentials
+AWS_PROFILE=analyst aws s3 ls s3://my-secure-bucket
+
+# IAM Policy Simulator (console) or CLI example
+aws iam simulate-principal-policy --policy-source-arn \
+  arn:aws:iam::<ACCOUNT_ID>:user/analyst-user --action-names s3:GetObject</div>
+
+                        <h4 class="font-bold text-lg mb-2">Step 5: Cleanup & Rotation</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Rotate access keys every 90 days; prefer federation with MFA for long-term use.</li>
+                            <li>Teardown after the lab: detach policies, remove keys, delete users/groups.</li>
+                            <li>Confirm CloudTrail is on; review access logs for the lab period.</li>
                         </ul>
-
-                        <h4 class="font-bold text-lg mb-2">Step 3: Enable MFA</h4>
-                        <p class="mb-2">Rotate access keys every 90 days and enable MFA for root accounts.</p>
                     </div>
-
-                    <div id="lab6" class="lab-content hidden">
+<div id="lab6" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 6: Differential Privacy</h3>
-                        <p class="text-slate-600 mb-6">Implement Laplace Noise to protect data queries.</p>
+                        <p class="text-slate-600 mb-6">Implement correct Laplace noise, bound sensitivity, and observe privacy/utility trade-offs.</p>
 
-                        <h4 class="font-bold text-lg mb-2">Step 1: Define Query</h4>
-                        <p class="mb-2">Target Query: Average Score of students.</p>
+                        <h4 class="font-bold text-lg mb-2">Step 1: Define the Query & Sensitivity</h4>
+                        <p class="mb-2">Example: class average. Bound each student's score to [0, 100] so L1 sensitivity of the sum is 100; for the average, sensitivity = 100 / n.</p>
 
-                        <h4 class="font-bold text-lg mb-2">Step 2: Implement Laplace Noise</h4>
-                        <p class="mb-2">Add noise drawn from a Laplace distribution scaled to sensitivity.</p>
+                        <h4 class="font-bold text-lg mb-2">Step 2: Implement Laplace Mechanism</h4>
+                        <p class="mb-2">Scale = sensitivity / epsilon (δ not used for Laplace ε-DP).</p>
                         <div class="code-block">
 import numpy as np
-from scipy import stats
 
-def laplace_noise(true_answer, epsilon, delta):
-    # Calculate scale (sigma)
-    sigma = np.sqrt(2 * epsilon / delta)
-    
-    # Add noise
-    noise = stats.laplace.rvs(loc=0, scale=sigma)
+def laplace_mech(true_answer, sensitivity, epsilon):
+    scale = sensitivity / epsilon
+    noise = np.random.laplace(loc=0, scale=scale)
     return true_answer + noise
 
-# Example Usage
-true_avg = 85.5
-epsilon = 1.0  # Privacy budget
-noisy_avg = laplace_noise(true_avg, epsilon, 1.0)
-print(f"True: {true_avg}, Noisy: {noisy_avg}")</div>
+# Example usage
+scores = [88, 92, 77, 95, 84]
+bounded = [min(100, max(0, s)) for s in scores]
+true_avg = sum(bounded) / len(bounded)
+sensitivity = 100 / len(bounded)
+epsilon = 1.0
+noisy_avg = laplace_mech(true_avg, sensitivity, epsilon)
+print(f"True: {true_avg:.2f}, Noisy: {noisy_avg:.2f}")</div>
 
-                        <h4 class="font-bold text-lg mb-2">Step 3: Evaluate Accuracy</h4>
-                        <p class="mb-2">Observe that as Epsilon increases (less privacy), accuracy improves (error decreases).</p>
+                        <h4 class="font-bold text-lg mb-2">Step 3: Explore Composition & Accuracy</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Run the query repeatedly; track total ε budget spent.</li>
+                            <li>Plot error distributions for ε = 0.1, 0.5, 1, 5 to visualize utility.</li>
+                            <li>Discuss clipping/normalization choices and their impact on sensitivity.</li>
+                        </ul>
                     </div>
 
                 </div>

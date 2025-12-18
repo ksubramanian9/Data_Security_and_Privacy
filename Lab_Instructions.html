@@ -285,6 +285,13 @@ sha256sum plaintext.txt decrypted_ciphertext.txt</div>
                             <li>Keep <code>iv.bin</code> and <code>aes.key.enc</code> with ciphertext; keep <code>private.pem</code> offline.</li>
                             <li>Document who holds each key and rotate keys for new exercises.</li>
                         </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Deliverables</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Archive containing <code>public.pem</code>, <code>aes.key.enc</code>, <code>iv.bin</code>, and the encrypted payload (no private keys).</li>
+                            <li>Terminal log showing successful <code>diff</code> comparison and optional <code>sha256sum</code> verification.</li>
+                            <li>Short note describing key handling choices (where keys were stored, how permissions were set, and rotation approach).</li>
+                        </ul>
                     </div>
 <div id="lab2" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 2: Configure Access Control Policies in a Database</h3>
@@ -363,6 +370,14 @@ SELECT event_time, user_host, argument FROM mysql.general_log
                             <li>Show how to disable logging after the lab: <code>SET GLOBAL general_log = 'OFF';</code></li>
                             <li>Rotate passwords or drop test users when finished.</li>
                         </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Deliverables</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>SQL script or dump that creates roles, users, and grants used during validation.</li>
+                            <li>Session transcript demonstrating <code>SET ROLE</code> checks (successful SELECT, blocked INSERT for analyst, etc.).</li>
+                            <li>Audit log snippet or screenshots showing captured queries and a brief rationale for each privilege granted.</li>
+                            <li>Cleanup confirmation (commands run to revoke privileges or drop lab accounts).</li>
+                        </ul>
                     </div>
 <div id="lab3" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 3: Implement Multi-Factor Authentication (MFA)</h3>
@@ -413,6 +428,13 @@ else:
                             <li>Rotate secrets on device loss and enforce per-session nonce/state to prevent replay.</li>
                             <li>Deactivate the virtual environment after testing: <code>deactivate</code>.</li>
                         </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Deliverables</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Generated TOTP secret stored securely (share only the provisioning URI QR image, not the raw secret, in the submission folder).</li>
+                            <li>Verification log showing at least one successful and one failed attempt with enforced retry limits.</li>
+                            <li>Write-up describing how secrets were protected (environment variables, storage location) and how clock drift was handled.</li>
+                        </ul>
                     </div>
 <div id="lab4" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 4: Case Study - Capital One Data Breach</h3>
@@ -451,6 +473,14 @@ else:
                             <li>Document blast radius, data classification, and customer impact.</li>
                             <li>Implement compensating controls: IMDSv2, rotate keys, least-privilege WAF/IAM, alerting on anomalous role usage.</li>
                             <li>Schedule retests and track owners in a playbook template.</li>
+                        </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Deliverables</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Incident timeline document with timestamps, sources, and detection gaps highlighted.</li>
+                            <li>Control mapping table aligning observed weaknesses to NIST CSF categories and proposed remediations.</li>
+                            <li>Completed tabletop drill notes (roles, decisions taken, and follow-up actions/owners).</li>
+                            <li>Postmortem summary emphasizing blast radius, customer impact, and prioritized hardening steps.</li>
                         </ul>
                     </div>
 <div id="lab5" class="lab-content hidden">
@@ -515,6 +545,14 @@ aws iam simulate-principal-policy --policy-source-arn \
                             <li>Teardown after the lab: detach policies, remove keys, delete users/groups.</li>
                             <li>Confirm CloudTrail is on; review access logs for the lab period.</li>
                         </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Deliverables</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>JSON policy file(s) used plus CLI commands to create groups, users, and attachments.</li>
+                            <li>Evidence of validation: <code>aws sts get-caller-identity</code>, policy simulation output, and sample S3 access results.</li>
+                            <li>CloudTrail excerpt or screenshot showing IAM actions during the lab.</li>
+                            <li>Cleanup log showing detached policies, deleted keys, and removed lab identities.</li>
+                        </ul>
                     </div>
 <div id="lab6" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 6: Differential Privacy</h3>
@@ -547,6 +585,13 @@ print(f"True: {true_avg:.2f}, Noisy: {noisy_avg:.2f}")</div>
                             <li>Run the query repeatedly; track total ε budget spent.</li>
                             <li>Plot error distributions for ε = 0.1, 0.5, 1, 5 to visualize utility.</li>
                             <li>Discuss clipping/normalization choices and their impact on sensitivity.</li>
+                        </ul>
+
+                        <h4 class="font-bold text-lg mb-2">Deliverables</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1">
+                            <li>Notebook or script implementing the Laplace mechanism with comments on sensitivity bounds.</li>
+                            <li>Plots or tables showing noisy results for multiple ε values with a brief accuracy discussion.</li>
+                            <li>Privacy budget tracker (how ε was consumed across repeated queries) and reflections on utility trade-offs.</li>
                         </ul>
                     </div>
 

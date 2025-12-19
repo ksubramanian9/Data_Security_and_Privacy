@@ -55,7 +55,7 @@
         .side-link.active{background:linear-gradient(90deg,#eff6ff,#e6f2ff);color:var(--accent-600);box-shadow:0 6px 20px rgba(37,99,235,0.08)}
 
         /* Content sections */
-        .content-section,.observe-section{scroll-margin-top:120px}
+        .content-section{scroll-margin-top:120px}
 
         /* Cards */
         .stat-card{background:var(--card-bg);padding:1.25rem;border-radius:.9rem;box-shadow:0 10px 30px var(--soft-border);border:1px solid rgba(15,23,42,0.03)}
@@ -109,20 +109,16 @@
             <aside class="side-nav">
                 <nav class="flex flex-col gap-2" aria-label="Section navigation">
                     <a class="side-link active" href="#overview">Overview</a>
-                    <a class="side-link" href="#overview-themes">Key Themes</a>
                     <a class="side-link" href="#threats">Key Threats</a>
-                    <a class="side-link" href="#threats-deep-dive">Threat Deep Dive</a>
                     <a class="side-link" href="#regulations">Regulations</a>
-                    <a class="side-link" href="#regulations-frameworks">Frameworks</a>
                     <a class="side-link" href="#solutions">Solutions</a>
-                    <a class="side-link" href="#solutions-emerging">Emerging Tech</a>
                     <a class="side-link" href="#future">Future Outlook</a>
                 </nav>
             </aside>
 
             <div class="space-y-16">
         <!-- Overview Section -->
-        <section id="overview" class="content-section observe-section space-y-8">
+        <section id="overview" class="content-section space-y-8">
             <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center">
                 Welcome to this interactive report on the current state of data security and privacy. This section provides a high-level overview of the key findings, including critical statistics and the core themes defining today's landscape. Use the navigation above to dive deeper into specific topics.
             </p>
@@ -439,6 +435,7 @@
                 });
             }
 
+            const sections = document.querySelectorAll('.content-section');
             const sideLinks = document.querySelectorAll('.side-link');
 
             const highlightObserver = new IntersectionObserver((entries) => {
@@ -456,8 +453,7 @@
                 threshold: 0.3
             });
 
-            const observedSections = document.querySelectorAll('.observe-section');
-            observedSections.forEach(section => highlightObserver.observe(section));
+            sections.forEach(section => highlightObserver.observe(section));
 
             const chartObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -478,6 +474,27 @@
             if (threatsSection) chartObserver.observe(threatsSection);
             if (regulationsSection) chartObserver.observe(regulationsSection);
 
+            const observedSections = document.querySelectorAll('.observe-section');
+            observedSections.forEach(section => highlightObserver.observe(section));
+
+            const chartObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (entry.target.id === 'threats' && !threatsChartInstance) {
+                            createThreatsChart();
+                        }
+                        if (entry.target.id === 'regulations' && !regulationsChartInstance) {
+                            createRegulationsChart();
+                        }
+                        chartObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.25 });
+
+            setupInteractiveTabs('overview');
+            setupInteractiveTabs('threats');
+            setupInteractiveTabs('regulations');
+            setupInteractiveTabs('solutions');
         });
     </script>
 </body>

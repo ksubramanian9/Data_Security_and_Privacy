@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit I — Intro to Data Privacy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%); color:#0f172a}
+    .card{background:white;border-radius:14px;padding:1.5rem;box-shadow:0 10px 28px rgba(15,23,42,0.08);border:1px solid rgba(15,23,42,0.06)}
+    .muted{color:#64748b}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:0.45rem 0.8rem;background:#e0f2fe;color:#0ea5e9;font-weight:700;border-radius:999px;font-size:0.8rem;letter-spacing:0.02em}
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="bg-slate-900 text-white shadow">
+    <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="text-2xl font-bold">Data Security &amp; Privacy</div>
+        <p class="text-slate-300 text-sm hidden md:block">Unit I — Foundations of Privacy</p>
+      </div>
+      <div class="flex flex-wrap gap-2 text-sm font-semibold">
+        <a href="index.html" class="px-3 py-2 rounded-lg bg-slate-800">Home</a>
+        <a href="Data_Security_and_Privacy.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Report</a>
+        <a href="Encryption_Techniques.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Encryption</a>
+        <a href="Data_Security_Privacy_Threats.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Threats</a>
+        <a href="Access_Control_and_Authentication.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Access Control</a>
+        <a href="Lab_Instructions.html" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Labs</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6 md:p-10 space-y-8">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div>
+        <p class="pill">Unit I — Intro to Data Privacy</p>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3">Designing privacy-first data ecosystems</h1>
+        <p class="muted mt-3 max-w-3xl">This unit provides practical guidance for building trustworthy data systems: how to govern data responsibly, document datasets for reuse, protect individuals with differential privacy, and anchor every design decision in the CIA Triad.</p>
+      </div>
+      <div class="card w-full md:w-auto">
+        <h2 class="text-lg font-bold text-slate-900">At a glance</h2>
+        <ul class="mt-2 text-sm text-slate-600 space-y-1">
+          <li>Audience: Data engineers, analysts, security teams</li>
+          <li>Outcome: Operational playbook for privacy-by-design</li>
+          <li>Artifacts: Data inventory, DPIA, privacy risk scorecard</li>
+        </ul>
+      </div>
+    </div>
+
+    <section class="card space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">1</div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Data Governance &amp; Privacy Approaches</h2>
+          <p class="muted">Build a governance layer that aligns policy, accountability, and technical controls.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+          <h3 class="font-semibold text-blue-800">Core guardrails</h3>
+          <ul class="list-disc list-inside text-slate-700 text-sm space-y-1 mt-2">
+            <li>Data classification mapped to retention and encryption requirements.</li>
+            <li>Role-based access tied to business purpose and least privilege.</li>
+            <li>Data Processing Impact Assessments (DPIAs) for new pipelines.</li>
+            <li>Audit trails for data movement, sharing, and policy exceptions.</li>
+          </ul>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">Operating model</h3>
+          <ol class="list-decimal list-inside text-slate-700 text-sm space-y-1 mt-2">
+            <li>Define owners: product, security, and data stewards per domain.</li>
+            <li>Codify policies in code via IaC and data catalog rules.</li>
+            <li>Continuously monitor compliance with automated drift alerts.</li>
+            <li>Review quarterly with evidence (logs, approvals, exceptions).</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="card space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">2</div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Documenting Data for Use</h2>
+          <p class="muted">Clarity in documentation reduces privacy risk and accelerates trusted reuse.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">What to capture</h3>
+          <ul class="list-disc list-inside space-y-1 mt-2">
+            <li>Data categories (PII, sensitive, operational).</li>
+            <li>Purpose limitation &amp; legal basis.</li>
+            <li>Data lineage: source → transform → consumer.</li>
+            <li>Retention schedule and deletion triggers.</li>
+          </ul>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
+          <h3 class="font-semibold text-emerald-900">Implementation checklist</h3>
+          <ul class="list-disc list-inside space-y-1 mt-2">
+            <li>Use a central catalog with ownership and SLA fields.</li>
+            <li>Attach sample queries and approved use-cases.</li>
+            <li>Mark derived vs. raw fields and join keys.</li>
+            <li>Include data quality signals (freshness, null %, anomalies).</li>
+          </ul>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">Signals of trust</h3>
+          <ul class="list-disc list-inside space-y-1 mt-2">
+            <li>Up-to-date DPIA linked in the catalog entry.</li>
+            <li>Access requests show purpose &amp; data minimization proof.</li>
+            <li>Clear contact for questions or deletion requests.</li>
+            <li>Version history of schema and policy changes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">3</div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Defining Differential Privacy</h2>
+          <p class="muted">Mathematically bound the privacy loss from data releases.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 text-sm text-slate-700">
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">Key ideas</h3>
+          <ul class="list-disc list-inside space-y-1 mt-2">
+            <li><strong>ε (epsilon):</strong> Privacy budget that limits information gain about any individual.</li>
+            <li><strong>δ (delta):</strong> Probability of the privacy guarantee failing; keep it tiny.</li>
+            <li><strong>Sensitivity:</strong> Maximum change in output if one record is removed.</li>
+            <li><strong>Mechanisms:</strong> Laplace/Gaussian noise, randomized response, and subsampling.</li>
+          </ul>
+        </div>
+        <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+          <h3 class="font-semibold text-indigo-900">Practical playbook</h3>
+          <ol class="list-decimal list-inside space-y-1 mt-2">
+            <li>Define queries and bound their sensitivity.</li>
+            <li>Allocate a privacy budget per user journey or dashboard.</li>
+            <li>Compose budgets across releases and reset only with new consent.</li>
+            <li>Publish utility metrics so teams understand the noise trade-offs.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="card space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold">4</div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Key Concept: CIA Triad</h2>
+          <p class="muted">Anchor privacy protections in security fundamentals.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 text-sm text-slate-700">
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">Confidentiality</h3>
+          <p class="mt-2">Encrypt at rest/in transit, segment networks, and enforce fine-grained access with MFA.</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">Integrity</h3>
+          <p class="mt-2">Use digital signatures, checksums, and versioned pipelines with immutability guarantees.</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <h3 class="font-semibold text-slate-900">Availability</h3>
+          <p class="mt-2">Apply redundancy, backups with restore drills, and rate-limiting to withstand abuse.</p>
+        </div>
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-700">
+        <h3 class="font-semibold text-slate-900">Design decision rubric</h3>
+        <p class="mt-2">For each data product change, answer: (1) Does confidentiality decrease? (2) What proof of integrity exists? (3) How is availability maintained under attack or failure?</p>
+      </div>
+    </section>
+
+    <section class="card space-y-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold">✓</div>
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">5-Minute Implementation Checklist</h2>
+          <p class="muted">Use this before shipping any new data pipeline or dashboard.</p>
+        </div>
+      </div>
+      <ul class="list-disc list-inside text-slate-700 text-sm space-y-1">
+        <li>Catalog entry created with owner, purpose, and retention metadata.</li>
+        <li>Access scoped to the smallest dataset needed; approvals logged.</li>
+        <li>Encryption and key rotation confirmed for storage and transit.</li>
+        <li>Privacy budget assigned if releasing aggregates; noise parameters documented.</li>
+        <li>Runbooks include rollback steps and contacts for incident response.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="max-w-6xl mx-auto p-6 text-sm muted">Unit I reference — Data Privacy and Security (AD23631). Updated 2025.</footer>
+</body>
+</html>

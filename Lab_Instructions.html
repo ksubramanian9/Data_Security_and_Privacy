@@ -243,6 +243,14 @@
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 1: Implement Secure Data Communication with AES and RSA</h3>
                         <p class="text-slate-600 mb-6">Generate modern RSA keys, wrap an AES key with OAEP, encrypt data with AES-256-CBC, and verify integrity/cleanup.</p>
 
+                        <h4 class="font-bold text-lg mb-2">Environment Setup</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1 mb-4">
+                            <li>Use a Linux/macOS shell (or WSL on Windows) with OpenSSL 1.1+ or 3.x installed: <code>openssl version</code>.</li>
+                            <li>Ensure shell utilities are available: <code>chmod</code>, <code>xxd</code>, <code>diff</code>, and <code>sha256sum</code>.</li>
+                            <li>Create a dedicated working directory with write access to avoid permissions errors when generating keys.</li>
+                            <li>If working on a shared lab machine, plan a secure storage location (home directory or encrypted volume) for temporary keys.</li>
+                        </ul>
+
                         <h4 class="font-bold text-lg mb-2">Step 1: Generate RSA Keys (2048-bit)</h4>
                         <p class="mb-2">Use the supported <code>pkey</code>/<code>pkeyutl</code> commands instead of deprecated rsautl.</p>
                         <div class="code-block">
@@ -312,6 +320,14 @@ sha256sum plaintext.txt decrypted_ciphertext.txt</div>
 <div id="lab2" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 2: Configure Access Control Policies in a Database</h3>
                         <p class="text-slate-600 mb-6">Create sample tables, roles, and grants in MySQL or PostgreSQL; verify and revoke privileges; inspect audit events.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Environment Setup</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1 mb-4">
+                            <li>Have MySQL or PostgreSQL installed locally (or running in Docker) with permission to create databases, roles, and users.</li>
+                            <li>Ensure the CLI client works: <code>mysql -u root -p</code> or <code>psql -U postgres</code>; note connection host/port for remote instances.</li>
+                            <li>Enable or locate the audit/logging mechanism you will query (MySQL general log table or PostgreSQL <code>pgaudit</code> extension).</li>
+                            <li>Create a clean lab schema or database to avoid altering production data; record admin credentials securely.</li>
+                        </ul>
 
                         <h4 class="font-bold text-lg mb-2">Step 1: Create a Database & Tables</h4>
                         <div class="code-block">
@@ -399,6 +415,14 @@ SELECT event_time, user_host, argument FROM mysql.general_log
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 3: Implement Multi-Factor Authentication (MFA)</h3>
                         <p class="text-slate-600 mb-6">Create a virtual environment, onboard a TOTP secret with a QR code, and verify codes with drift/rate-limit protections.</p>
 
+                        <h4 class="font-bold text-lg mb-2">Environment Setup</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1 mb-4">
+                            <li>Install Python 3.9+ with <code>pip</code> and <code>venv</code> modules available: <code>python3 --version</code>.</li>
+                            <li>Verify you can install packages from PyPI (network access) or have an offline wheel cache for <code>pyotp</code> and <code>qrcode[pil]</code>.</li>
+                            <li>Have a camera-enabled authenticator app (Google Authenticator, Authy, 1Password) ready to scan the generated QR code.</li>
+                            <li>Choose a workspace with write permissions to create the virtual environment and output image files.</li>
+                        </ul>
+
                         <h4 class="font-bold text-lg mb-2">Step 1: Isolate & Install Dependencies</h4>
                         <div class="code-block">
 python3 -m venv .venv
@@ -456,6 +480,14 @@ else:
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 4: Case Study - Capital One Data Breach</h3>
                         <p class="text-slate-600 mb-6">Build a timeline, map controls, and run a tabletop drill based on the 2019 Capital One breach.</p>
 
+                        <h4 class="font-bold text-lg mb-2">Environment Setup</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1 mb-4">
+                            <li>Use a note-taking tool (Docs, Markdown editor, or wiki) and a spreadsheet or table template for timelines and roles.</li>
+                            <li>Have internet access to reference public incident reports, indictments, and remediation write-ups.</li>
+                            <li>Prepare a collaboration space (shared doc or whiteboard) if working in teams for the tabletop drill.</li>
+                            <li>Create a dedicated folder to store evidence logs, role assignments, and postmortem outputs.</li>
+                        </ul>
+
                         <div class="bg-red-50 p-4 rounded-lg border border-red-100 mb-6">
                             <h4 class="font-bold text-red-800 mb-2">Incident Overview</h4>
                             <ul class="list-disc list-inside text-red-700 text-sm space-y-1">
@@ -502,6 +534,14 @@ else:
 <div id="lab5" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 5: Cloud IAM (AWS)</h3>
                         <p class="text-slate-600 mb-6">Set up a sandbox account, create IAM users/groups/policies via CLI, validate permissions, and clean up safely.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Environment Setup</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1 mb-4">
+                            <li>Use a sandbox/training AWS account with non-production credentials and MFA enabled.</li>
+                            <li>Install and configure the AWS CLI v2: <code>aws --version</code>; confirm access keys are stored securely (not in code repos).</li>
+                            <li>Optional local practice: have Docker installed to run LocalStack/MinIO/Keycloak without touching AWS.</li>
+                            <li>Ensure network egress is allowed for AWS API calls or configure the CLI to point at your local simulator endpoint.</li>
+                        </ul>
 
                         <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
                             <h4 class="font-bold text-blue-800 mb-2">Optional: Practice IAM Locally</h4>
@@ -584,6 +624,14 @@ aws iam simulate-principal-policy --policy-source-arn \
 <div id="lab6" class="lab-content hidden">
                         <h3 class="text-2xl font-bold text-slate-800 mb-4">Lab 6: Differential Privacy</h3>
                         <p class="text-slate-600 mb-6">Implement correct Laplace noise, bound sensitivity, and observe privacy/utility trade-offs.</p>
+
+                        <h4 class="font-bold text-lg mb-2">Environment Setup</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-1 mb-4">
+                            <li>Install Python 3.9+ with <code>numpy</code> available; optionally install <code>matplotlib</code> for plotting.</li>
+                            <li>Use a Jupyter Notebook or a Python script runner (e.g., VS Code, terminal) with permission to install packages.</li>
+                            <li>Set a fixed random seed (optional) if you need reproducible noise for comparisons.</li>
+                            <li>Prepare a small sample dataset (e.g., exam scores) and ensure sensitive values are bounded to [0, 100] as noted.</li>
+                        </ul>
 
                         <h4 class="font-bold text-lg mb-2">Step 1: Define the Query & Sensitivity</h4>
                         <p class="mb-2">Example: class average. Bound each student's score to [0, 100] so L1 sensitivity of the sum is 100; for the average, sensitivity = 100 / n.</p>
